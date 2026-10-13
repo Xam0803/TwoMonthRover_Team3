@@ -1,10 +1,35 @@
 import sys
+import json
+import rclpy
+from rclpy.node import Node
+from std_msgs.msg import String
 from PyQt6.QtWidgets import (
     QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout, QGridLayout, QFrame, QPushButton
 )
 from PyQt6.QtCore import Qt, QPointF, QTimer
 from PyQt6.QtGui import QPainter, QPen, QColor, QKeyEvent
+import os
+os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
+os.environ["QT_ENABLE_HIGHDPI_SCALING"] = "1"
+class GroundStationROSNode(Node):
+    def __init__(self, telemetry_callback):
+        super().__init__('axiom_ground_station_node')
+        self.telemetry_callback = telemetry_callback
+        
+        # 1. Telemetry Subscriber (Reads BMP388 & BNO055 from Orange Pi)
+        self.telemetry_sub = self.create_subscription(
+            String, '/rover/telemetry', self.telemetry_callback, 10
+        )
+        
+        # 2. Arm / Joint Target Publisher (Matches "Publish to Arm Positions Topic" in Flowchart)
+        self.arm_cmd_pub = self.create_publisher(
+            String, '/rover/arm_commands', 10
+        )
 
+    def publish_arm_targets(self, angles_dict):
+        msg = String()
+        msg.data = json.dumps(angles_dict)
+        self.arm_cmd_pub.publish(msg)
 
 class JointVisualizer(QWidget):
     def __init__(self, title="Joint"):
@@ -44,8 +69,9 @@ class JointVisualizer(QWidget):
 
 
 class GroundStationCanvas(QWidget):
-    def __init__(self):
+    def __init__(self, ros_node=None):
         super().__init__()
+        self.ros_node = ros_node
         self.angles = {
             "base": 0.0,
             "lower_elbow": 0.0,
@@ -145,12 +171,28 @@ class GroundStationCanvas(QWidget):
         main_layout.addLayout(top_layout, stretch=3)
 
         bottom_panel = QFrame()
-        bottom_panel.setStyleSheet("border-top: 2px solid #222225; background-color: #0d0d0f;")
+        bottom_panel.setStyleSheet("border-top: 2px solid #222225; background-color: #0d0d0f; padding: 5px;")
         
         bottom_layout = QVBoxLayout(bottom_panel)
-        reserved_label = QLabel("RESERVED TELEMETRY & SENSOR PANEL")
-        reserved_label.setStyleSheet("color: #44444c; font-size: 12px; font-weight: bold;")
-        bottom_layout.addWidget(reserved_label, alignment=Qt.AlignmentFlag.AlignCenter)
+        reserved_label = QLabel("LIVE ROS 2 TELEMETRY & SENSOR FEED")
+        reserved_label.setStyleSheet("color: #00FF88; font-size: 12px; font-weight: bold;")
+        bottom_layout.addWidget(reserved_label, alignment=Qt.AlignmentFlag.AlignLeft)
+
+        sensor_layout = QHBoxLayout()
+        self.time_label = QLabel("TIME: --:--:--")
+        self.time_label.setStyleSheet("color: #888888; font-size: 12px;")
+
+        self.bmp_label = QLabel("BMP388: Temp -- °C | Press -- hPa | Alt -- m")
+        self.bmp_label.setStyleSheet("color: #FFFFFF; font-size: 12px;")
+
+        self.bno_label = QLabel("BNO055: Yaw --° | Pitch --° | Roll --°")
+        self.bno_label.setStyleSheet("color: #FFFFFF; font-size: 12px;")
+
+        sensor_layout.addWidget(self.time_label)
+        sensor_layout.addWidget(self.bmp_label)
+        sensor_layout.addWidget(self.bno_label)
+        
+        bottom_layout.addLayout(sensor_layout)
 
         main_layout.addWidget(bottom_panel, stretch=1)
 
@@ -191,13 +233,34 @@ class GroundStationCanvas(QWidget):
 
         if all_at_zero:
             self.reset_timer.stop()
+    def update_telemetry_ui(self, data):
+        """Callback to update GUI telemetry labels when ROS 2 message arrives."""
+        if "timestamp" in data:
+            self.time_label.setText(f"TIME: {data['timestamp']}")
+        
+        if "bmp388" in data:
+            bmp = data["bmp388"]
+            self.bmp_label.setText(
+                f"BMP388: Temp {bmp.get('temp_c', '--')} °C | "
+                f"Press {bmp.get('pressure_hpa', '--')} hPa | "
+                f"Alt {bmp.get('alt_m', '--')} m"
+            )
+            
+        if "bno055" in data:
+            bno = data["bno055"]
+            self.bno_label.setText(
+                f"BNO055: Yaw {bno.get('yaw', '--')}° | "
+                f"Pitch {bno.get('pitch', '--')}° | "
+                f"Roll {bno.get('roll', '--')}°"
+            )
 
     def update_visualizers(self):
         self.viz_base.set_angle(self.angles["base"])
         self.viz_lower.set_angle(self.angles["lower_elbow"])
         self.viz_upper.set_angle(self.angles["upper_joint"])
         self.viz_wrist.set_angle(self.angles["wrist"])
-
+        self.ros_node.publish_arm_targets(self.angles)
+        
     def keyPressEvent(self, event: QKeyEvent):
         if not event.isAutoRepeat():
             self.pressed_keys.add(event.key())
@@ -235,8 +298,28 @@ class GroundStationCanvas(QWidget):
         self.update_visualizers()
 
 
-if __name__ == "__main__":
+def main():
+    # Initialize ROS 2
+    rclpy.init()
+    
     app = QApplication(sys.argv)
-    window = GroundStationCanvas()
+    
+    window = None
+    def handle_incoming_telemetry(msg):
+        data = json.loads(msg.data)
+        if window:
+            window.update_telemetry_ui(data)
+
+    ros_node = GroundStationROSNode(handle_incoming_telemetry)
+    window = GroundStationCanvas(ros_node)
     window.show()
+
+    # Spin ROS 2 background events inside PyQt6 loop
+    ros_timer = QTimer()
+    ros_timer.timeout.connect(lambda: rclpy.spin_once(ros_node, timeout_sec=0))
+    ros_timer.start(10)
+
     sys.exit(app.exec())
+
+if __name__ == "__main__":
+    main()
