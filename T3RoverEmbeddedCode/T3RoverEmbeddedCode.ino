@@ -34,8 +34,8 @@ if (!rtc.begin()) {
     Serial.println(F("SD CARD FAILED, OR NOT PRESENT!"));
     while (1);
   }
-  Serial.println(F("SD CARD INITIALIZED."));
-  Serial.println(F("--------------------"));
+  Serial.println("SD CARD INITIALIZED.");
+  Serial.println("--------------------");
 
   if (!bmp.begin_I2C()) {  
     Serial.println("Could not find a valid BMP3 sensor, check wiring!");
