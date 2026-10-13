@@ -52,10 +52,10 @@ class BaseRotationIndicator(QWidget):
             painter.setPen(active_pen)
 
             if self.direction == 1:
-                # Right side: Start at 12 o'clock (90°), sweep Clockwise (-180°) through 3 o'clock
+                # Right side: Start at 12 o'clock (90), sweep Clockwise (-180) through 3 o'clock
                 painter.drawArc(rect, 90 * 16, -180 * 16)
             elif self.direction == -1:
-                # Left side: Start at 12 o'clock (90°), sweep Counter-Clockwise (180°) through 9 o'clock
+                # Left side: Start at 12 o'clock (90), sweep Counter-Clockwise (180) through 9 o'clock
                 painter.drawArc(rect, 90 * 16, 180 * 16)
 
 
@@ -163,7 +163,7 @@ class GroundStationCanvas(QWidget):
         main_layout = QVBoxLayout(self)
         top_layout = QHBoxLayout()
 
-        # --- LEFT PANEL (Controls & Info) ---
+        # LEFT PANEL (Controls & Info) 
         left_panel = QVBoxLayout()
         title_label = QLabel("AXIOM GROUND STATION")
         title_label.setStyleSheet("color: #FFFFFF; font-size: 18px; font-weight: bold;")
@@ -204,7 +204,7 @@ class GroundStationCanvas(QWidget):
         line.setStyleSheet("color: #222225;")
         top_layout.addWidget(line)
 
-        # --- RIGHT PANEL (Indicators & Graphs) ---
+        # RIGHT PANEL (Indicators & Graphs)
         right_panel = QVBoxLayout()
         viz_header = QLabel("JOINT KINEMATIC DISPLAY")
         viz_header.setStyleSheet("color: #00FF88; font-size: 14px; font-weight: bold;")
@@ -255,7 +255,7 @@ class GroundStationCanvas(QWidget):
 
         right_panel.addLayout(charts_layout)
         
-        # --- Live Time Readout Under Graphs ---
+        # Live Time Readout Under Graphs 
         self.lbl_telemetry = QLabel("TIME: --:--:--")
         self.lbl_telemetry.setStyleSheet("color: #00FF64; font-family: monospace; font-size: 13px; font-weight: bold; padding: 5px;")
         right_panel.addWidget(self.lbl_telemetry)
@@ -263,7 +263,7 @@ class GroundStationCanvas(QWidget):
         top_layout.addLayout(right_panel, stretch=2)
         main_layout.addLayout(top_layout, stretch=3)
 
-        # --- BOTTOM PANEL (6 Live Metric Readout Cards) ---
+        # BOTTOM PANEL (6 Live Metric Readout Cards) 
         bottom_panel = QFrame()
         bottom_panel.setStyleSheet("border-top: 2px solid #222225; background-color: #0d0d0f; padding: 10px;")
         
