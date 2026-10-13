@@ -1,0 +1,12 @@
+Base Station Instructions
+
+(In Maxs-MacBook-Air-5)
+open -a XQuartz && DISPLAY=:0 xhost +
+
+(open vm and enter project folder)
+cd /Users/maxmitchler/Documents/GitHub/TwoMonthRover_Team3
+
+(Then in VM terminal)
+source /opt/ros/humble/setup.bash
+export DISPLAY=host.orb.internal:0
+python3 app.py
