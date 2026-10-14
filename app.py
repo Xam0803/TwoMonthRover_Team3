@@ -423,4 +423,153 @@ class GroundStationCanvas(QWidget):
             self.joint_base -= step
             self.base_dir = -1
             moved = True
-        elif Qt.Key.Key_D in self.pressed_keys
+        elif Qt.Key.Key_D in self.pressed_keys:
+            self.joint_base += step
+            self.base_dir = 1
+            moved = True
+        else:
+            self.base_dir = 0
+
+        if Qt.Key.Key_W in self.pressed_keys:
+            self.joint_lower_elbow += step
+            moved = True
+        if Qt.Key.Key_S in self.pressed_keys:
+            self.joint_lower_elbow -= step
+            moved = True
+
+        if Qt.Key.Key_I in self.pressed_keys:
+            self.joint_upper += step
+            moved = True
+        if Qt.Key.Key_K in self.pressed_keys:
+            self.joint_upper -= step
+            moved = True
+
+        if Qt.Key.Key_J in self.pressed_keys:
+            self.joint_wrist -= step
+            moved = True
+        if Qt.Key.Key_L in self.pressed_keys:
+            self.joint_wrist += step
+            moved = True
+
+        self.update_dial_visualizers()
+
+        if moved:
+            cmd = {
+                "lower_elbow": self.joint_lower_elbow,
+                "upper_joint": self.joint_upper,
+                "wrist": self.joint_wrist,
+                "base_dir": self.base_dir
+            }
+            self.ros_node.send_arm_command(cmd)
+
+    def update_dial_visualizers(self):
+        """Updates needle position and directional arcs for custom dial widgets."""
+        self.viz_base.set_direction(self.base_dir)
+        self.viz_elbow.set_angle(self.joint_lower_elbow)
+        self.viz_upper.set_angle(self.joint_upper)
+        self.viz_wrist.set_angle(self.joint_wrist)
+
+    def reset_arm_position(self):
+        self.joint_base = 0.0
+        self.joint_lower_elbow = -49.5
+        self.joint_upper = -21.0
+        self.joint_wrist = 16.5
+        self.base_dir = 0
+        self.update_dial_visualizers()
+
+        cmd = {
+            "lower_elbow": self.joint_lower_elbow,
+            "upper_joint": self.joint_upper,
+            "wrist": self.joint_wrist,
+            "base_dir": self.base_dir
+        }
+        self.ros_node.send_arm_command(cmd)
+
+    def spin_ros(self):
+        rclpy.spin_once(self.ros_node, timeout_sec=0)
+
+    def render_telemetry_data(self, data):
+        """Renders telemetry payload dictionary onto UI plots and metrics."""
+        if "timestamp" in data:
+            self.lbl_telemetry.setText(f"TIME: {data['timestamp']}")
+
+        if "bmp388" in data:
+            bmp = data["bmp388"]
+            temp = bmp.get('temp_c')
+            press = bmp.get('pressure_hpa')
+            alt = bmp.get('alt_m')
+
+            if temp is not None:
+                self.lbl_val_temp.setText(f"{temp:.1f} °C")
+                self.temp_data = self.temp_data[1:] + [float(temp)]
+                self.curve_temp.setData(self.time_data, self.temp_data)
+
+            if press is not None:
+                self.lbl_val_press.setText(f"{press:.1f} hPa")
+                self.press_data = self.press_data[1:] + [float(press)]
+                self.curve_press.setData(self.time_data, self.press_data)
+
+            if alt is not None:
+                self.lbl_val_alt.setText(f"{alt:.2f} m")
+
+        if "bno055" in data:
+            bno = data["bno055"]
+            if "yaw" in bno:
+                self.lbl_val_yaw.setText(f"{bno['yaw']:.1f}°")
+            if "pitch" in bno:
+                self.lbl_val_pitch.setText(f"{bno['pitch']:.1f}°")
+            if "roll" in bno:
+                self.lbl_val_roll.setText(f"{bno['roll']:.1f}°")
+
+    def update_telemetry_ui(self, data):
+        """Callback for live ROS 2 telemetry packets."""
+        if not self.sim_mode:
+            self.render_telemetry_data(data)
+
+    def update_mock_telemetry(self):
+        """Generates dynamic live-scrolling simulated telemetry data when in Simulation Mode."""
+        if not self.sim_mode:
+            return
+
+        current_time = time.strftime("%Y/%m/%d %H:%M:%S")
+        t = time.time()
+
+        # Dynamic rolling sine-wave simulation for temperature & pressure curves
+        mock_temp = 25.0 + 2.0 * math.sin(t / 8.0) + (t % 0.4 - 0.2)
+        mock_press = 980.0 + 5.0 * math.cos(t / 12.0) + (t % 0.8 - 0.4)
+        mock_alt = 94.2 + 0.5 * math.sin(t / 15.0)
+
+        mock_data = {
+            "timestamp": current_time,
+            "bmp388": {
+                "temp_c": mock_temp,
+                "pressure_hpa": mock_press,
+                "alt_m": mock_alt
+            },
+            "bno055": {
+                "yaw": (t * 4.0) % 360.0 - 180.0,
+                "pitch": 10.0 * math.sin(t / 6.0),
+                "roll": 5.0 * math.cos(t / 8.0)
+            }
+        }
+        self.render_telemetry_data(mock_data)
+
+
+def main():
+    rclpy.init()
+    app = QApplication(sys.argv)
+    
+    ros_node = GroundStationROSNode(telemetry_callback=None)
+    gui = GroundStationCanvas(ros_node)
+    ros_node.telemetry_callback = gui.update_telemetry_ui
+
+    gui.show()
+    exit_code = app.exec()
+
+    ros_node.destroy_node()
+    rclpy.shutdown()
+    sys.exit(exit_code)
+
+
+if __name__ == '__main__':
+    main()
