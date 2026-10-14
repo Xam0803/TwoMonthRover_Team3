@@ -1,9 +1,11 @@
 import sys
-import os
 import json
-import random
-import math
-from datetime import datetime
+import time
+from PyQt6.QtWidgets import (QApplication, QWidget, QVBoxLayout, QHBoxLayout, 
+                             QGridLayout, QLabel, QFrame, QPushButton, QDial)
+from PyQt6.QtCore import Qt, QTimer
+from PyQt6.QtGui import QPixmap
+import pyqtgraph as pg
 
 import rclpy
 from rclpy.node import Node
@@ -52,10 +54,10 @@ class BaseRotationIndicator(QWidget):
             painter.setPen(active_pen)
 
             if self.direction == 1:
-                # Right side: Start at 12 o'clock (90), sweep Clockwise (-180) through 3 o'clock
+                # Right side: Start at 12 o'clock (90°), sweep Clockwise (-180°) through 3 o'clock
                 painter.drawArc(rect, 90 * 16, -180 * 16)
             elif self.direction == -1:
-                # Left side: Start at 12 o'clock (90), sweep Counter-Clockwise (180) through 9 o'clock
+                # Left side: Start at 12 o'clock (90°), sweep Counter-Clockwise (180°) through 9 o'clock
                 painter.drawArc(rect, 90 * 16, 180 * 16)
 
 
@@ -99,71 +101,89 @@ class JointVisualizer(QWidget):
 
 
 class GroundStationROSNode(Node):
+    """ROS 2 Node handling telemetry subscriptions and arm command publishing."""
     def __init__(self, telemetry_callback):
-        super().__init__('axiom_ground_station_node')
+        super().__init__('axiom_ground_station')
         self.telemetry_callback = telemetry_callback
-        
-        self.telemetry_sub = self.create_subscription(
-            String, '/rover/telemetry', self.telemetry_callback, 10
-        )
-        self.arm_cmd_pub = self.create_publisher(
-            String, '/rover/arm_commands', 10
+
+        # Subscriber for Orange Pi telemetry JSON packets
+        self.sub_telemetry = self.create_subscription(
+            String,
+            '/rover/telemetry',
+            self.on_telemetry_received,
+            10
         )
 
-    def publish_arm_targets(self, angles_dict):
+        # Publisher for arm command JSON payloads
+        self.pub_commands = self.create_publisher(
+            String,
+            '/rover/arm_commands',
+            10
+        )
+
+    def on_telemetry_received(self, msg):
+        try:
+            data = json.loads(msg.data)
+            if self.telemetry_callback:
+                self.telemetry_callback(data)
+        except json.JSONDecodeError:
+            self.get_logger().error("Received malformed JSON telemetry packet.")
+
+    def send_arm_command(self, cmd_dict):
         msg = String()
-        msg.data = json.dumps(angles_dict)
-        self.arm_cmd_pub.publish(msg)
+        msg.data = json.dumps(cmd_dict)
+        self.pub_commands.publish(msg)
 
 
 class GroundStationCanvas(QWidget):
-    def __init__(self, ros_node=None):
+    """Main Ground Station GUI application with high-contrast daylight theme & circular dials."""
+    def __init__(self, ros_node):
         super().__init__()
-        
         self.ros_node = ros_node
-        self.base_direction = 0
-        self.angles = {
-            "lower_elbow": 0.0,
-            "upper_joint": 0.0,
-            "wrist": 0.0
-        }
+        self.setWindowTitle("AXIOM Ground Station - ROS 2 Humble")
+        self.resize(1200, 750)
+        self.setStyleSheet("background-color: #F2F4F7;")
 
-        # 1. Keyboard focus configuration
-        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-
-        # 2. Key processing timer
+        # Active joint angle states (Degrees)
+        self.joint_base = 0.0
+        self.joint_lower_elbow = 0.0
+        self.joint_upper = 0.0
+        self.joint_wrist = 0.0
+        self.base_dir = 0
         self.pressed_keys = set()
-        self.key_timer = QTimer(self)
-        self.key_timer.setInterval(33)  # ~30 FPS
-        self.key_timer.timeout.connect(self._process_held_keys)
-        self.key_timer.start()
 
-        self.reset_timer = QTimer(self)
-        self.reset_timer.setInterval(30)
-        self.reset_timer.timeout.connect(self._step_reset)
+        # Telemetry plot data buffers (last 30 samples)
+        self.max_samples = 30
+        self.time_data = list(range(self.max_samples))
+        self.temp_data = [25.0] * self.max_samples
+        self.press_data = [1013.25] * self.max_samples
 
-        # 3. Chart data arrays
-        self.time_data = list(range(50))
-        self.temp_data = [25.0] * 50
-        self.press_data = [1000.0] * 50
-
-        # 4. Build user interface
         self.init_ui()
 
-        # 5. Telemetry update timer
+        # ROS 2 executor timer (~33 Hz)
+        self.ros_timer = QTimer(self)
+        self.ros_timer.timeout.connect(self.spin_ros)
+        self.ros_timer.start(30)
+
+        # Control polling timer (30 Hz)
+        self.control_timer = QTimer(self)
+        self.control_timer.timeout.connect(self.process_control_inputs)
+        self.control_timer.start(33)
+
+        # Fallback mock telemetry generator (1 Hz)
         self.mock_timer = QTimer(self)
         self.mock_timer.timeout.connect(self.update_mock_telemetry)
         self.mock_timer.start(1000)
 
     def init_ui(self):
-        self.setWindowTitle("AXIOM Ground Station")
-        self.resize(1050, 650)
-        self.setStyleSheet("background-color: #121214;")
-
         main_layout = QVBoxLayout(self)
+        main_layout.setSpacing(10)
+        main_layout.setContentsMargins(12, 12, 12, 12)
+
+        # --- TOP SECTION: CONTROLS, KINEMATIC DIALS & CHARTS ---
         top_layout = QHBoxLayout()
 
-        # LEFT PANEL (Controls & Info) 
+        # --- LEFT PANEL (Controls & Info) ---
         left_panel = QVBoxLayout()
         title_label = QLabel("AXIOM GROUND STATION")
         title_label.setStyleSheet("color: #FFFFFF; font-size: 18px; font-weight: bold;")
@@ -175,101 +195,125 @@ class GroundStationCanvas(QWidget):
             "• I / K : Upper Joint\n"
             "• J / L : Wrist / Claw Rotation"
         )
-        controls_label.setStyleSheet("color: #AAAAAA; font-size: 13px; line-height: 1.5;")
+        lbl_ctrls = QLabel(instructions)
+        lbl_ctrls.setStyleSheet("color: #1A1D20; font-size: 11px; border: 1px solid #DCDFE6; background: #F8F9FA; padding: 6px; border-radius: 4px;")
+        left_layout.addWidget(lbl_ctrls)
 
-        left_panel.addWidget(title_label)
-        left_panel.addSpacing(15)
-        left_panel.addWidget(controls_label)
-        left_panel.addStretch()
+        # Wall-E image display
+        lbl_walle = QLabel()
+        pixmap_walle = QPixmap("walle.png")
+        if not pixmap_walle.isNull():
+            lbl_walle.setPixmap(pixmap_walle.scaledToWidth(200, Qt.TransformationMode.SmoothTransformation))
+            lbl_walle.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            lbl_walle.setStyleSheet("border: none; background: transparent; padding-top: 4px;")
+            left_layout.addWidget(lbl_walle, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        btn_style = "font-weight: bold; font-size: 12px; border-radius: 5px; padding: 10px;"
+        # Reset button
+        btn_reset = QPushButton("RESET POSITION")
+        btn_reset.setStyleSheet("""
+            QPushButton {
+                background-color: #D32F2F;
+                color: #FFFFFF;
+                font-weight: bold;
+                font-size: 11px;
+                padding: 8px;
+                border-radius: 4px;
+                border: none;
+            }
+            QPushButton:hover {
+                background-color: #B71C1C;
+            }
+        """)
+        btn_reset.clicked.connect(self.reset_arm_position)
+        left_layout.addWidget(btn_reset)
 
-        self.power_btn = QPushButton("POWER SYSTEM")
-        self.power_btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.power_btn.setStyleSheet(btn_style + "background-color: #222226; color: #55555d; border: 1px solid #333338;")
-        left_panel.addWidget(self.power_btn)
-
-        left_panel.addSpacing(8)
-
-        self.reset_btn = QPushButton("RESET POSITION")
-        self.reset_btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.reset_btn.setStyleSheet(btn_style + "background-color: #1f1215; color: #ff4444; border: 1px solid #441a1c;")
-        self.reset_btn.clicked.connect(self.start_smooth_reset)
-        left_panel.addWidget(self.reset_btn)
-
-        top_layout.addLayout(left_panel, stretch=1)
+        left_layout.addStretch()
+        top_layout.addWidget(left_panel, stretch=1)
 
         line = QFrame()
         line.setFrameShape(QFrame.Shape.VLine)
         line.setStyleSheet("color: #222225;")
         top_layout.addWidget(line)
 
-        # RIGHT PANEL (Indicators & Graphs)
+        # --- RIGHT PANEL (Indicators & Graphs) ---
         right_panel = QVBoxLayout()
         viz_header = QLabel("JOINT KINEMATIC DISPLAY")
         viz_header.setStyleSheet("color: #00FF88; font-size: 14px; font-weight: bold;")
         right_panel.addWidget(viz_header, alignment=Qt.AlignmentFlag.AlignHCenter)
 
-        grid_layout = QGridLayout()
+        grid_dials = QHBoxLayout()
+        grid_dials.setSpacing(12)
 
-        # Base Rotation Indicator
-        base_container = QWidget()
-        base_layout = QVBoxLayout(base_container)
-        base_layout.setContentsMargins(5, 5, 5, 5)
-        lbl_base_title = QLabel("BASE ROTATION")
-        lbl_base_title.setStyleSheet("color: #888888; font-size: 11px; font-weight: bold;")
-        
-        self.viz_base = BaseRotationIndicator()
-        self.lbl_base_val = QLabel("IDLE")
-        self.lbl_base_val.setStyleSheet("color: #00FF88; font-size: 11px; font-weight: bold;")
-        self.lbl_base_val.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        def create_circular_dial(title_text, min_val=-180, max_val=180):
+            container = QFrame()
+            container.setStyleSheet("background-color: #F8F9FA; border: 1.5px solid #000000; border-radius: 6px;")
+            c_layout = QVBoxLayout(container)
+            c_layout.setContentsMargins(6, 6, 6, 6)
 
-        base_layout.addWidget(lbl_base_title, alignment=Qt.AlignmentFlag.AlignHCenter)
-        base_layout.addWidget(self.viz_base, alignment=Qt.AlignmentFlag.AlignCenter)
-        base_layout.addWidget(self.lbl_base_val)
+            lbl_title = QLabel(title_text)
+            lbl_title.setStyleSheet("color: #4A5568; font-size: 10px; font-weight: bold;")
 
-        # Other Joints
-        self.viz_lower = JointVisualizer("Lower Elbow")
-        self.viz_upper = JointVisualizer("Upper Joint")
-        self.viz_wrist = JointVisualizer("Wrist / Claw")
+            dial = QDial()
+            dial.setRange(min_val, max_val)
+            dial.setNotchesVisible(True)
+            dial.setEnabled(False)  # Display-only circular gauge
+            dial.setFixedSize(70, 70)
+            dial.setStyleSheet("QDial { background-color: #FFFFFF; }")
 
-        grid_layout.addWidget(base_container, 0, 0)
-        grid_layout.addWidget(self.create_labeled_widget("LOWER ELBOW JOINT", self.viz_lower), 0, 1)
-        grid_layout.addWidget(self.create_labeled_widget("UPPER JOINT", self.viz_upper), 1, 0)
-        grid_layout.addWidget(self.create_labeled_widget("WRIST / CLAW TWIST", self.viz_wrist), 1, 1)
+            lbl_val = QLabel("0.0°")
+            lbl_val.setStyleSheet("color: #000000; font-size: 12px; font-weight: bold; font-family: monospace;")
 
-        right_panel.addLayout(grid_layout)
+            c_layout.addWidget(lbl_title, alignment=Qt.AlignmentFlag.AlignHCenter)
+            c_layout.addWidget(dial, alignment=Qt.AlignmentFlag.AlignHCenter)
+            c_layout.addWidget(lbl_val, alignment=Qt.AlignmentFlag.AlignHCenter)
+            return container, dial, lbl_val
 
-        # Live Graphs
+        card_dial_base, self.dial_base, self.lbl_val_dial_base = create_circular_dial("BASE ROTATION")
+        card_dial_elbow, self.dial_elbow, self.lbl_val_dial_elbow = create_circular_dial("LOWER ELBOW")
+        card_dial_upper, self.dial_upper, self.lbl_val_dial_upper = create_circular_dial("UPPER JOINT")
+        card_dial_wrist, self.dial_wrist, self.lbl_val_dial_wrist = create_circular_dial("WRIST TWIST")
+
+        grid_dials.addWidget(card_dial_base)
+        grid_dials.addWidget(card_dial_elbow)
+        grid_dials.addWidget(card_dial_upper)
+        grid_dials.addWidget(card_dial_wrist)
+
+        dials_layout.addLayout(grid_dials)
+        mid_right_layout.addWidget(dials_frame)
+
+        # --- CHARTS SECTION ---
         charts_layout = QHBoxLayout()
-        
-        self.plot_temp = pg.PlotWidget(title="Temperature (°C)")
-        self.plot_temp.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.curve_temp = self.plot_temp.plot(self.time_data, self.temp_data, pen=pg.mkPen(color='#ff5555', width=2))
+
+        # Temperature Plot
+        self.plot_temp = pg.PlotWidget(title="<b>TEMPERATURE (°C)</b>")
+        self.plot_temp.showGrid(x=True, y=True, alpha=0.3)
+        self.curve_temp = self.plot_temp.plot(pen=pg.mkPen(color='#D32F2F', width=2))
+
+        # Pressure Plot
+        self.plot_press = pg.PlotWidget(title="<b>PRESSURE (hPa)</b>")
+        self.plot_press.showGrid(x=True, y=True, alpha=0.3)
+        self.curve_press = self.plot_press.plot(pen=pg.mkPen(color='#0288D1', width=2))
+
         charts_layout.addWidget(self.plot_temp)
-        
-        self.plot_press = pg.PlotWidget(title="Pressure (hPa)")
-        self.plot_press.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        self.curve_press = self.plot_press.plot(self.time_data, self.press_data, pen=pg.mkPen(color='#5555ff', width=2))
         charts_layout.addWidget(self.plot_press)
 
         right_panel.addLayout(charts_layout)
         
-        # Live Time Readout Under Graphs 
+        # --- Live Time Readout Under Graphs ---
         self.lbl_telemetry = QLabel("TIME: --:--:--")
-        self.lbl_telemetry.setStyleSheet("color: #00FF64; font-family: monospace; font-size: 13px; font-weight: bold; padding: 5px;")
-        right_panel.addWidget(self.lbl_telemetry)
+        self.lbl_telemetry.setStyleSheet("color: #007A33; font-family: monospace; font-size: 13px; font-weight: bold; padding: 2px;")
+        mid_right_layout.addWidget(self.lbl_telemetry)
 
-        top_layout.addLayout(right_panel, stretch=2)
+        top_layout.addLayout(mid_right_layout, stretch=3)
         main_layout.addLayout(top_layout, stretch=3)
 
-        # BOTTOM PANEL (6 Live Metric Readout Cards) 
+        # --- BOTTOM PANEL (6 Live Metric Readout Cards) ---
         bottom_panel = QFrame()
-        bottom_panel.setStyleSheet("border-top: 2px solid #222225; background-color: #0d0d0f; padding: 10px;")
+        bottom_panel.setStyleSheet("background-color: #FFFFFF; border: 2px solid #C0C4CC; border-radius: 8px; padding: 10px;")
         
         bottom_layout = QVBoxLayout(bottom_panel)
         reserved_label = QLabel("LIVE SENSOR READINGS")
-        reserved_label.setStyleSheet("color: #00FF88; font-size: 12px; font-weight: bold;")
+        reserved_label.setStyleSheet("color: #000000; font-size: 12px; font-weight: bold;")
         bottom_layout.addWidget(reserved_label, alignment=Qt.AlignmentFlag.AlignLeft)
 
         grid_sensor = QGridLayout()
@@ -277,15 +321,15 @@ class GroundStationCanvas(QWidget):
 
         def create_metric_card(title_text):
             card = QFrame()
-            card.setStyleSheet("background-color: #16161a; border: 1px solid #2a2a30; border-radius: 6px;")
+            card.setStyleSheet("background-color: #F8F9FA; border: 1.5px solid #000000; border-radius: 6px;")
             c_layout = QVBoxLayout(card)
             c_layout.setContentsMargins(8, 6, 8, 6)
             
             lbl_title = QLabel(title_text)
-            lbl_title.setStyleSheet("color: #888888; font-size: 10px; font-weight: bold;")
+            lbl_title.setStyleSheet("color: #4A5568; font-size: 11px; font-weight: bold;")
             
             lbl_val = QLabel("--")
-            lbl_val.setStyleSheet("color: #00FF88; font-size: 15px; font-weight: bold; font-family: monospace;")
+            lbl_val.setStyleSheet("color: #000000; font-size: 15px; font-weight: bold; font-family: monospace;")
             lbl_val.setAlignment(Qt.AlignmentFlag.AlignCenter)
             
             c_layout.addWidget(lbl_title, alignment=Qt.AlignmentFlag.AlignHCenter)
@@ -309,126 +353,125 @@ class GroundStationCanvas(QWidget):
         bottom_layout.addLayout(grid_sensor)
         main_layout.addWidget(bottom_panel, stretch=1)
 
+    def keyPressEvent(self, event):
+        self.pressed_keys.add(event.key())
+        if event.key() == Qt.Key.Key_R:
+            self.reset_arm_position()
 
+    def keyReleaseEvent(self, event):
+        self.pressed_keys.discard(event.key())
 
-    def create_labeled_widget(self, title_text, visualizer):
-        container = QWidget()
-        layout = QVBoxLayout(container)
-        layout.setContentsMargins(5, 5, 5, 5)
+    def process_control_inputs(self):
+        """Polls held keys, updates joint target positions, and updates circular dials."""
+        step = 1.0
+        moved = False
 
-        lbl = QLabel(title_text)
-        lbl.setStyleSheet("color: #888888; font-size: 11px; font-weight: bold;")
-        
-        layout.addWidget(lbl, alignment=Qt.AlignmentFlag.AlignHCenter)
-        layout.addWidget(visualizer)
-        return container
-
-    def mousePressEvent(self, event):
-        super().mousePressEvent(event)
-        self.setFocus()
-
-    def keyPressEvent(self, event: QKeyEvent):
-        if not event.isAutoRepeat():
-            self.pressed_keys.add(event.key())
-            self._update_base_indicator()
-
-    def keyReleaseEvent(self, event: QKeyEvent):
-        if not event.isAutoRepeat():
-            self.pressed_keys.discard(event.key())
-            self._update_base_indicator()
-
-    def _update_base_indicator(self):
-        if Qt.Key.Key_D in self.pressed_keys and Qt.Key.Key_A not in self.pressed_keys:
-            self.base_direction = 1
-            self.viz_base.set_direction(1)
-            self.lbl_base_val.setText("CLOCKWISE")
-        elif Qt.Key.Key_A in self.pressed_keys and Qt.Key.Key_D not in self.pressed_keys:
-            self.base_direction = -1
-            self.viz_base.set_direction(-1)
-            self.lbl_base_val.setText("COUNTER-CLOCKWISE")
+        if Qt.Key.Key_A in self.pressed_keys:
+            self.joint_base -= step
+            self.base_dir = -1
+            moved = True
+        elif Qt.Key.Key_D in self.pressed_keys:
+            self.joint_base += step
+            self.base_dir = 1
+            moved = True
         else:
-            self.base_direction = 0
-            self.viz_base.set_direction(0)
-            self.lbl_base_val.setText("IDLE")
-        
-        self.update_visualizers()
-
-    def _process_held_keys(self):
-        if not self.pressed_keys:
-            return
-
-        step = 1.5
-        changed = False
+            self.base_dir = 0
 
         if Qt.Key.Key_W in self.pressed_keys:
-            self.angles["lower_elbow"] = min(90.0, self.angles["lower_elbow"] + step)
-            changed = True
+            self.joint_lower_elbow += step
+            moved = True
         if Qt.Key.Key_S in self.pressed_keys:
-            self.angles["lower_elbow"] = max(-90.0, self.angles["lower_elbow"] - step)
-            changed = True
+            self.joint_lower_elbow -= step
+            moved = True
 
         if Qt.Key.Key_I in self.pressed_keys:
-            self.angles["upper_joint"] = min(90.0, self.angles["upper_joint"] + step)
-            changed = True
+            self.joint_upper += step
+            moved = True
         if Qt.Key.Key_K in self.pressed_keys:
-            self.angles["upper_joint"] = max(-90.0, self.angles["upper_joint"] - step)
-            changed = True
+            self.joint_upper -= step
+            moved = True
 
         if Qt.Key.Key_J in self.pressed_keys:
-            self.angles["wrist"] = max(-180.0, self.angles["wrist"] - step)
-            changed = True
+            self.joint_wrist -= step
+            moved = True
         if Qt.Key.Key_L in self.pressed_keys:
-            self.angles["wrist"] = min(180.0, self.angles["wrist"] + step)
-            changed = True
+            self.joint_wrist += step
+            moved = True
 
-        if changed:
-            self.update_visualizers()
+        if moved:
+            self.update_dial_visualizers()
+            cmd = {
+                "lower_elbow": self.joint_lower_elbow,
+                "upper_joint": self.joint_upper,
+                "wrist": self.joint_wrist,
+                "base_dir": self.base_dir
+            }
+            self.ros_node.send_arm_command(cmd)
 
-    def update_visualizers(self):
-        self.viz_lower.set_angle(self.angles["lower_elbow"])
-        self.viz_upper.set_angle(self.angles["upper_joint"])
-        self.viz_wrist.set_angle(self.angles["wrist"])
-        
-        if self.ros_node:
-            cmd_payload = dict(self.angles)
-            cmd_payload["base_dir"] = self.base_direction
-            self.ros_node.publish_arm_targets(cmd_payload)
+    def update_dial_visualizers(self):
+        """Updates the needle position and numerical readout for all 4 circular dials."""
+        # Base
+        self.dial_base.setValue(int(self.joint_base))
+        self.lbl_val_dial_base.setText(f"{self.joint_base:.1f}°")
 
-    def start_smooth_reset(self):
-        if not self.reset_timer.isActive():
-            self.reset_timer.start()
+        # Lower Elbow
+        self.dial_elbow.setValue(int(self.joint_lower_elbow))
+        self.lbl_val_dial_elbow.setText(f"{self.joint_lower_elbow:.1f}°")
 
-    def _step_reset(self):
-        reset_speed = 1.5
-        all_at_zero = True
+        # Upper Joint
+        self.dial_upper.setValue(int(self.joint_upper))
+        self.lbl_val_dial_upper.setText(f"{self.joint_upper:.1f}°")
 
-        for joint_key in ["lower_elbow", "upper_joint", "wrist"]:
-            current_val = self.angles[joint_key]
-            if abs(current_val) > reset_speed:
-                all_at_zero = False
-                if current_val > 0:
-                    self.angles[joint_key] -= reset_speed
-                else:
-                    self.angles[joint_key] += reset_speed
-            else:
-                self.angles[joint_key] = 0.0
+        # Wrist
+        self.dial_wrist.setValue(int(self.joint_wrist))
+        self.lbl_val_dial_wrist.setText(f"{self.joint_wrist:.1f}°")
 
-        self.update_visualizers()
+    def reset_arm_position(self):
+        self.joint_base = 0.0
+        self.joint_lower_elbow = 0.0
+        self.joint_upper = 0.0
+        self.joint_wrist = 0.0
+        self.base_dir = 0
+        self.update_dial_visualizers()
 
-        if all_at_zero:
-            self.reset_timer.stop()
+        cmd = {
+            "lower_elbow": 0.0,
+            "upper_joint": 0.0,
+            "wrist": 0.0,
+            "base_dir": 0
+        }
+        self.ros_node.send_arm_command(cmd)
+
+    def spin_ros(self):
+        rclpy.spin_once(self.ros_node, timeout_sec=0)
 
     def update_telemetry_ui(self, data):
-        """Updates metric cards when real ROS 2 telemetry arrives."""
+        """Updates metric cards and charts upon receipt of real ROS 2 telemetry."""
+        if self.mock_timer.isActive():
+            self.mock_timer.stop()
+
+        if "timestamp" in data:
+            self.lbl_telemetry.setText(f"TIME: {data['timestamp']}")
+
         if "bmp388" in data:
             bmp = data["bmp388"]
-            if "temp_c" in bmp:
-                self.lbl_val_temp.setText(f"{bmp['temp_c']:.1f} °C")
-            if "pressure_hpa" in bmp:
-                self.lbl_val_press.setText(f"{bmp['pressure_hpa']:.1f} hPa")
-            if "alt_m" in bmp:
-                self.lbl_val_alt.setText(f"{bmp['alt_m']:.2f} m")
-            
+            temp = bmp.get('temp_c')
+            press = bmp.get('pressure_hpa')
+            alt = bmp.get('alt_m')
+
+            if temp is not None:
+                self.lbl_val_temp.setText(f"{temp:.1f} °C")
+                self.temp_data = self.temp_data[1:] + [float(temp)]
+                self.curve_temp.setData(self.time_data, self.temp_data)
+
+            if press is not None:
+                self.lbl_val_press.setText(f"{press:.1f} hPa")
+                self.press_data = self.press_data[1:] + [float(press)]
+                self.curve_press.setData(self.time_data, self.press_data)
+
+            if alt is not None:
+                self.lbl_val_alt.setText(f"{alt:.2f} m")
+
         if "bno055" in data:
             bno = data["bno055"]
             if "yaw" in bno:
@@ -439,58 +482,39 @@ class GroundStationCanvas(QWidget):
                 self.lbl_val_roll.setText(f"{bno['roll']:.1f}°")
 
     def update_mock_telemetry(self):
-        """Updates pyqtgraph chart data and bottom live sensor cards."""
-        new_temp = self.temp_data[-1] + random.uniform(-0.5, 0.5)
-        new_press = self.press_data[-1] + random.uniform(-1.5, 1.5)
-        
-        self.temp_data = self.temp_data[1:] + [new_temp]
-        self.press_data = self.press_data[1:] + [new_press]
-        
-        self.curve_temp.setData(self.time_data, self.temp_data)
-        self.curve_press.setData(self.time_data, self.press_data)
-        
-        # Update time under graphs
-        timestamp = datetime.now().strftime("%Y/%m/%d %H:%M:%S")
-        self.lbl_telemetry.setText(f"TIME: {timestamp}")
-
-        # Update 6 Live Metric Cards with mock readings
-        mock_alt = 93.81 + random.uniform(-0.1, 0.1)
-        mock_yaw = random.uniform(-1.0, 1.0)
-        mock_pitch = random.uniform(-0.5, 0.5)
-        mock_roll = random.uniform(-0.5, 0.5)
-
-        self.lbl_val_temp.setText(f"{new_temp:.1f} °C")
-        self.lbl_val_press.setText(f"{new_press:.1f} hPa")
-        self.lbl_val_alt.setText(f"{mock_alt:.2f} m")
-        self.lbl_val_yaw.setText(f"{mock_yaw:.1f}°")
-        self.lbl_val_pitch.setText(f"{mock_pitch:.1f}°")
-        self.lbl_val_roll.setText(f"{mock_roll:.1f}°")
+        """Fallback mock generator operating until real ROS 2 telemetry arrives."""
+        current_time = time.strftime("%Y/%m/%d %H:%M:%S")
+        mock_data = {
+            "timestamp": current_time,
+            "bmp388": {
+                "temp_c": 24.5,
+                "pressure_hpa": 1012.8,
+                "alt_m": 94.2
+            },
+            "bno055": {
+                "yaw": 0.0,
+                "pitch": 0.0,
+                "roll": 0.0
+            }
+        }
+        self.update_telemetry_ui(mock_data)
 
 
 def main():
     rclpy.init()
     app = QApplication(sys.argv)
     
-    window = None
-    def handle_incoming_telemetry(msg):
-        try:
-            data = json.loads(msg.data)
-            if window:
-                window.update_telemetry_ui(data)
-        except Exception:
-            pass
+    ros_node = GroundStationROSNode(telemetry_callback=None)
+    gui = GroundStationCanvas(ros_node)
+    ros_node.telemetry_callback = gui.update_telemetry_ui
 
-    ros_node = GroundStationROSNode(handle_incoming_telemetry)
-    window = GroundStationCanvas(ros_node)
-    window.show()
+    gui.show()
+    exit_code = app.exec()
 
-    # Spin ROS 2 events smoothly without thrashing CPU
-    ros_timer = QTimer()
-    ros_timer.timeout.connect(lambda: rclpy.spin_once(ros_node, timeout_sec=0))
-    ros_timer.start(40)  # 25 Hz spin rate
-
-    sys.exit(app.exec())
+    ros_node.destroy_node()
+    rclpy.shutdown()
+    sys.exit(exit_code)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
