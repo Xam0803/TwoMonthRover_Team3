@@ -8,7 +8,7 @@ from PyQt6.QtWidgets import (
     QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout, 
     QGridLayout, QFrame, QPushButton
 )
-from PyQt6.QtCore import Qt, QPointF, QTimer
+from PyQt6.QtCore import Qt, QPointF, QRectF, QTimer
 from PyQt6.QtGui import QPainter, QPen, QColor, QPixmap
 import pyqtgraph as pg
 
@@ -27,7 +27,7 @@ pg.setConfigOption('antialias', False)      # Optimize render speed over X11
 
 
 class BaseRotationIndicator(QWidget):
-    """Custom ring visualizer highlighting CW/CCW rotation direction."""
+    """Custom circular ring visualizer highlighting CW/CCW base rotation direction."""
     def __init__(self, title="BASE ROTATION"):
         super().__init__()
         self.title = title
@@ -43,7 +43,9 @@ class BaseRotationIndicator(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.RenderHint.Antialiasing)
 
-        rect = self.rect().adjusted(20, 22, -20, -32)
+        w, h = self.width(), self.height()
+        cx, cy = w / 2, h / 2 - 3
+        radius = min(w, h) / 2 - 25
 
         # Title at top
         painter.setPen(QColor("#4A5568"))
@@ -57,9 +59,12 @@ class BaseRotationIndicator(QWidget):
             self.title
         )
 
+        # Centered square bounding rect ensures a PERFECT CIRCLE (never an oval)
+        circle_rect = QRectF(cx - radius, cy - radius, 2 * radius, 2 * radius)
+
         # Outer ring (Gray)
         painter.setPen(QPen(QColor("#718096"), 4))
-        painter.drawEllipse(rect)
+        painter.drawEllipse(circle_rect)
 
         # Active direction semi-circle arc (Vivid Green)
         if self.direction != 0:
@@ -68,11 +73,11 @@ class BaseRotationIndicator(QWidget):
             painter.setPen(active_pen)
 
             if self.direction == 1:
-                # Right side: CW
-                painter.drawArc(rect, 90 * 16, -180 * 16)
+                # Right side: CW arc
+                painter.drawArc(circle_rect, 90 * 16, -180 * 16)
             elif self.direction == -1:
-                # Left side: CCW
-                painter.drawArc(rect, 90 * 16, 180 * 16)
+                # Left side: CCW arc
+                painter.drawArc(circle_rect, 90 * 16, 180 * 16)
 
         # Status readout below
         status_text = "CLOCKWISE" if self.direction == 1 else "COUNTER-CW" if self.direction == -1 else "IDLE"
@@ -179,7 +184,7 @@ class GroundStationROSNode(Node):
 
 
 class GroundStationCanvas(QWidget):
-    """Main Ground Station GUI application with high-contrast daylight theme & restored custom dials."""
+    """Main Ground Station GUI application with high-contrast daylight theme."""
     def __init__(self, ros_node):
         super().__init__()
         self.ros_node = ros_node
@@ -190,11 +195,11 @@ class GroundStationCanvas(QWidget):
         # Mode State: Starts in Simulated Mode (Press 'T' to toggle)
         self.sim_mode = True
 
-        # Active joint angle states (Degrees)
+        # Active joint angle states (Degrees) - Default Home Position
         self.joint_base = 0.0
-        self.joint_lower_elbow = -49.5
-        self.joint_upper = -21.0
-        self.joint_wrist = 16.5
+        self.joint_lower_elbow = 0.0
+        self.joint_upper = 0.0
+        self.joint_wrist = 0.0
         self.base_dir = 0
         self.pressed_keys = set()
 
@@ -274,8 +279,9 @@ class GroundStationCanvas(QWidget):
             lbl_walle.setStyleSheet("border: none; background: transparent; padding-top: 4px;")
             left_layout.addWidget(lbl_walle, alignment=Qt.AlignmentFlag.AlignCenter)
 
-        # Reset button
+        # Reset button (NoFocus prevents stealing key events)
         btn_reset = QPushButton("RESET POSITION")
+        btn_reset.setFocusPolicy(Qt.FocusPolicy.NoFocus)
         btn_reset.setStyleSheet("""
             QPushButton {
                 background-color: #D32F2F;
@@ -470,18 +476,20 @@ class GroundStationCanvas(QWidget):
         self.viz_wrist.set_angle(self.joint_wrist)
 
     def reset_arm_position(self):
+        """Resets all arm joints to zero (home position) and clears key press buffer."""
         self.joint_base = 0.0
-        self.joint_lower_elbow = -49.5
-        self.joint_upper = -21.0
-        self.joint_wrist = 16.5
+        self.joint_lower_elbow = 0.0
+        self.joint_upper = 0.0
+        self.joint_wrist = 0.0
         self.base_dir = 0
+        self.pressed_keys.clear()
         self.update_dial_visualizers()
 
         cmd = {
-            "lower_elbow": self.joint_lower_elbow,
-            "upper_joint": self.joint_upper,
-            "wrist": self.joint_wrist,
-            "base_dir": self.base_dir
+            "lower_elbow": 0.0,
+            "upper_joint": 0.0,
+            "wrist": 0.0,
+            "base_dir": 0
         }
         self.ros_node.send_arm_command(cmd)
 
