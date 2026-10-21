@@ -1,132 +1,240 @@
-#include <Wire.h>
-#include <Adafruit_Sensor.h> 
-#include "Adafruit_BMP3XX.h"
-#include "BNO055_support.h"
-
+#include <string>
+#include <Servo.h>
+#include <SPI.h>
 #include <SD.h>
-#include <RTClib.h>
+#include <Wire.h>
+#include <Adafruit_Sensor.h>
+#include <Adafruit_BNO055.h>
+#include <utility/imumaths.h>
+#include "Adafruit_BMP3XX.h"
+#include <hardware/watchdog.h>
 
-unsigned long lastTime = 0;
-static constexpr int I2CSDA = 4;
-static constexpr int I2CSCL = 5;
+// =========================================================================
+// HARDWARE PIN DEFINITIONS
+// =========================================================================
 
-#define PIN_SPI_CS 10
-#define FILE_NAME "log.txt"
+// I2C Bus Pins (I2C0)
+#define I2C_SDA_PIN 2  // GP2
+#define I2C_SCL_PIN 3  // GP3
+#define WIRE Wire
+
+// SPI SD Card Bus Pins (SPI0)
+#define SD_PIN_MISO 16 // GP16 (SPI0 RX)
+#define SD_PIN_CS   17 // GP17 (SPI0 CSn)
+#define SD_PIN_SCK  18 // GP18 (SPI0 SCK)
+#define SD_PIN_MOSI 19 // GP19 (SPI0 TX)
+
 #define SEALEVELPRESSURE_HPA (1013.25)
-Adafruit_BMP3XX bmp;
-struct bno055_t myBNO;
-struct bno055_euler myEulerData;
 
-RTC_DS3231 rtc;
-File myFile;
+// GM9 DC Motor Driver (Base Rotation)
+#define MOTOR_DRIVER_BASE_IN1 7  // GP7
+#define MOTOR_DRIVER_BASE_IN2 6  // GP6
+#define MOTOR_DRIVER_BASE_PWM 11 // GP11
+
+// Servo GPIO Assignment
+// Servo 0: Smraza 45KG (Lower Elbow 270°) -> GP0
+// Servo 1: Miuzei 25KG (Upper Joint 180°)  -> GP1
+// Servo 2: MG996R     (Wrist Twist 180°)   -> GP4
+// Servo 3: MG996R     (Claw Open/Close)    -> GP12
+int servoPinNums[4] = {0, 1, 4, 12};
+Servo servos[4];
+
+// Servo Physical Angle Safety Boundaries
+float maxVals[4] = {270.0, 180.0, 180.0, 180.0};
+float minVals[4] = {0.0, 0.0, 0.0, 0.0};
+
+// Timers
+const uint32_t BLINK_INTERVAL = 1000;
+const uint32_t READ_INTERVAL  = 100;
+uint32_t lastBlink = 0;
+uint32_t lastRead = 0;
+bool ledState = false;
+
+// Functions
+String get_sensors();
+String printEvent(sensors_event_t* event);
+void write_to_SD(String filename, String dataline);
+
+Adafruit_BNO055 bno = Adafruit_BNO055(55, 0x28, &WIRE);
+Adafruit_BMP3XX bmp;
 
 void setup() {
   Serial.begin(115200);
-  Wire.setSDA(I2CSDA);
-  Wire.setSCL(I2CSCL);
-  Wire.begin();
+  delay(1000);
 
-if (!rtc.begin()) {
-    Serial.println(F("Couldn't find RTC"));
-    while (1);
-  }
-  if (!SD.begin(PIN_SPI_CS)) {
-    Serial.println(F("SD CARD FAILED, OR NOT PRESENT!"));
-    while (1);
-  }
-  Serial.println("SD CARD INITIALIZED.");
-  Serial.println("--------------------");
+  pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN, !ledState);
 
-  if (!bmp.begin_I2C()) {  
-    Serial.println("Could not find a valid BMP3 sensor, check wiring!");
-  }
-  bmp.setTemperatureOversampling(BMP3_OVERSAMPLING_8X);
-  bmp.setPressureOversampling(BMP3_OVERSAMPLING_4X);
-  bmp.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
-  bmp.setOutputDataRate(BMP3_ODR_50_HZ);
-  
-  BNO_Init(&myBNO); 
-  bno055_set_operation_mode(OPERATION_MODE_NDOF);
-  delay(10);
+  // Configure SPI0 Pins
+  SPI.setRX(SD_PIN_MISO);
+  SPI.setTX(SD_PIN_MOSI);
+  SPI.setSCK(SD_PIN_SCK);
 
+  // Base GM9 Motor Driver Pin Setup
+  pinMode(MOTOR_DRIVER_BASE_PWM, OUTPUT);
+  pinMode(MOTOR_DRIVER_BASE_IN1, OUTPUT);
+  pinMode(MOTOR_DRIVER_BASE_IN2, OUTPUT);
+
+  digitalWrite(MOTOR_DRIVER_BASE_IN1, LOW);
+  digitalWrite(MOTOR_DRIVER_BASE_IN2, LOW);
+
+  Serial.println("log:Setup base motor driver");
+
+  // Attach Servos
+  // Servo 0: Smraza 45KG 270° Servo (500us to 2500us pulse)
+  servos[0].attach(servoPinNums[0], 500, 2500);
+  // Servos 1-3: Standard 180° Servos (500us to 2500us pulse)
+  servos[1].attach(servoPinNums[1], 500, 2500);
+  servos[2].attach(servoPinNums[2], 500, 2500);
+  servos[3].attach(servoPinNums[3], 500, 2500);
+
+  // Configure I2C Pins
+  WIRE.setSCL(I2C_SCL_PIN);
+  WIRE.setSDA(I2C_SDA_PIN);
+  WIRE.begin();
+
+  if (!bno.begin()) {
+    Serial.println("log:Ooops, no BNO055 detected!");
+  } else {
+    Serial.println("log:BNO055 connected");
+  }
+
+  if (!bmp.begin_I2C(0x77, &WIRE)) {
+    Serial.println("log:Could not find BMP3 sensor!");
+  } else {
+    Serial.println("log:BMP388 connected");
+    bmp.setTemperatureOversampling(BMP3_OVERSAMPLING_8X);
+    bmp.setPressureOversampling(BMP3_OVERSAMPLING_4X);
+    bmp.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
+    bmp.setOutputDataRate(BMP3_ODR_50_HZ);
+  }
+
+  if (!SD.begin(SD_PIN_CS)) {
+    Serial.println("log:SD initialization failed!");
+  } else {
+    Serial.println("log:SD initialization done.");
+    write_to_SD("data.csv", "ACCELERATION_X,ACCELERATION_Y,ACCELERATION_Z,ALTITUDE,PRESSURE,TEMPERATURE");
+  }
+
+  digitalWrite(LED_BUILTIN, ledState);
 }
 
 void loop() {
-  if ((millis() - lastTime) >= 100) {
+  // 1. Heartbeat
+  if (millis() - lastBlink > BLINK_INTERVAL) {
+    lastBlink = millis();
+    ledState = !ledState;
+    digitalWrite(LED_BUILTIN, ledState);
+  }
 
-    lastTime = millis();
+  // 2. Process Commands: motor:val0,val1,val2,val3,val4
+  if (Serial.available()) {
+    String command = Serial.readStringUntil('\n');
+    command.trim();
 
-    myFile = SD.open(FILE_NAME, FILE_WRITE);
+    String type = command.substring(0, command.indexOf(":"));
 
-    Serial.print("Time Stamp: ");			
-    Serial.println(lastTime);
+    if (type == "ping") {
+      Serial.println("pong");
+    } 
+    else if (type == "reboot") {
+      watchdog_reboot(0, 0, 0);
+    } 
+    else if (type == "motor") {
+      String temp[5] = {""};
+      String partsStr = command.substring(command.indexOf(":") + 1);
 
-    if(myFile){
-
-      Serial.println("Writing log to SD Card");
-
-      DateTime now = rtc.now();
-
-      myFile.print(now.year()); myFile.print('/');
-      myFile.print(now.month()); myFile.print('/');
-      myFile.print(now.day()); myFile.print(" ");
-      myFile.print(now.hour()); myFile.print(':');
-      myFile.print(now.minute()); myFile.print(':');
-      myFile.print(now.second()); myFile.print(", ");
-
-      if (bmp.performReading()) {
-
-        myFile.print("Temp: ");
-        myFile.print(bmp.temperature);
-        myFile.print(" *C, Press: ");
-        myFile.print(bmp.pressure / 100.0);
-        myFile.print(" hPa, Alt: ");
-        myFile.print(bmp.readAltitude(SEALEVELPRESSURE_HPA));
-        myFile.print(" m, ");
-
-        Serial.print("Temperature = ");
-        Serial.print(bmp.temperature);
-        Serial.println(" *C");
-
-        Serial.print("Pressure = ");
-        Serial.print(bmp.pressure / 100.0);
-        Serial.println(" hPa");
-
-        Serial.print("Approx. Altitude = ");
-        Serial.print(bmp.readAltitude(SEALEVELPRESSURE_HPA));
-        Serial.println(" m");
-      } else {
-        Serial.println("Failed to perform reading :(");
+      for (int i = 0; i < 5; i++) {
+        if (partsStr.indexOf(",") != std::string::npos) {
+          temp[i] = partsStr.substring(0, partsStr.indexOf(","));
+          partsStr = partsStr.substring(partsStr.indexOf(",") + 1);
+        } else {
+          temp[i] = partsStr;
+          break;
+        }
       }
 
-      bno055_read_euler_hrp(&myEulerData);		
+      float values[5] = {0.0};
+      for (int i = 0; i < 5; i++) {
+        values[i] = temp[i].toFloat();
+      }
 
-      Serial.print("Heading(Yaw): ");				
-      Serial.println(float(myEulerData.h) / 16.00);		
+      // Clamp Servos 0-3
+      for (int i = 0; i < 4; i++) {
+        if (values[i] > maxVals[i]) values[i] = maxVals[i];
+        if (values[i] < minVals[i]) values[i] = minVals[i];
+      }
 
-      Serial.print("Roll: ");					
-      Serial.println(float(myEulerData.r) / 16.00);		
+      // 1. Smraza 45KG 270° Servo (Servo 0)
+      int pulse0 = map((int)values[0], 0, 270, 500, 2500);
+      servos[0].writeMicroseconds(pulse0);
 
-      Serial.print("Pitch: ");				
-      Serial.println(float(myEulerData.p) / 16.00);		
+      // 2. Standard 180° Servos (Servos 1, 2, 3)
+      servos[1].write((int)values[1]);
+      servos[2].write((int)values[2]);
+      servos[3].write((int)values[3]);
 
-      float yaw = float(myEulerData.h) / 16.00;
-      float roll = float(myEulerData.r) / 16.00;
-      float pitch = float(myEulerData.p) / 16.00;
+      // 3. GM9 DC Base Motor Driver (Motor 4)
+      if (values[4] > 0) {
+        digitalWrite(MOTOR_DRIVER_BASE_IN2, HIGH);
+        digitalWrite(MOTOR_DRIVER_BASE_IN1, LOW);
+      } else if (values[4] < 0) {
+        digitalWrite(MOTOR_DRIVER_BASE_IN1, HIGH);
+        digitalWrite(MOTOR_DRIVER_BASE_IN2, LOW);
+      } else {
+        digitalWrite(MOTOR_DRIVER_BASE_IN1, LOW);
+        digitalWrite(MOTOR_DRIVER_BASE_IN2, LOW);
+      }
 
-      myFile.print("Yaw: "); myFile.print(yaw);
-      myFile.print(", Roll: "); myFile.print(roll);
-      myFile.print(", Pitch: "); myFile.println(pitch);
-
-      myFile.close();
-
-    } else {
-    Serial.print("SD Card: error on opening file ");
-    Serial.println(FILE_NAME);
+      int pwmVal = (abs(values[4]) <= 1.0 && abs(values[4]) > 0) ? 255 : abs((int)values[4]);
+      if (values[4] == 0) pwmVal = 0;
+      analogWrite(MOTOR_DRIVER_BASE_PWM, pwmVal);
     }
-  }				
+  }
+
+  // 3. 10 Hz Telemetry Loop
+  if (millis() - lastRead > READ_INTERVAL) {
+    lastRead = millis();
+    String sensor_data = get_sensors();
+    Serial.println("sensor_data:" + sensor_data);
+    write_to_SD("data.csv", sensor_data);
+  }
 }
 
+String get_sensors() {
+  String dataline = "";
+  sensors_event_t linearAccelData;
+  bno.getEvent(&linearAccelData, Adafruit_BNO055::VECTOR_LINEARACCEL);
 
+  if (!bmp.performReading()) {
+    Serial.println("log:Failed to perform BMP reading!");
+  }
 
+  dataline += printEvent(&linearAccelData);
+  dataline += String(bmp.readAltitude(SEALEVELPRESSURE_HPA));
+  dataline += ",";
+  dataline += String(bmp.pressure / 100.0);
+  dataline += ",";
+  dataline += String(bmp.temperature);
+  return dataline;
+}
 
+String printEvent(sensors_event_t* event) {
+  double x = 0, y = 0, z = 0;
+  if (event->type == SENSOR_TYPE_LINEAR_ACCELERATION || event->type == SENSOR_TYPE_ACCELEROMETER) {
+    x = event->acceleration.x;
+    y = event->acceleration.y;
+    z = event->acceleration.z;
+  }
+  return String(x) + "," + String(y) + "," + String(z) + ",";
+}
+
+void write_to_SD(String filename, String dataline) {
+  File datafile = SD.open(filename, FILE_WRITE);
+  if (datafile) {
+    datafile.println(dataline);
+    datafile.close();
+  } else {
+    Serial.println("log:Error opening SD file!");
+  }
+}
