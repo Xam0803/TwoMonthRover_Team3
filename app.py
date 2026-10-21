@@ -1,562 +1,437 @@
+#!/usr/bin/env python3
+"""AXIOM Ground Station - Rover Arm Control & Telemetry GUI"""
+
 import sys
-import os
 import json
 import time
+import random
 import math
-import csv
+from datetime import datetime
 
 from PyQt6.QtWidgets import (
-    QApplication, QWidget, QLabel, QVBoxLayout, QHBoxLayout, 
-    QGridLayout, QFrame, QPushButton
+    QApplication, QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
+    QLabel, QGridLayout, QGroupBox, QFrame
 )
-from PyQt6.QtCore import Qt, QPointF, QRectF, QTimer
-from PyQt6.QtGui import QPainter, QPen, QColor, QPixmap
+from PyQt6.QtCore import QTimer, Qt
+from PyQt6.QtGui import QFont, QKeyEvent
+
 import pyqtgraph as pg
 
-import rclpy
-from rclpy.node import Node
-from std_msgs.msg import String
-
-# Configure environment for X11 forwarding / High-DPI display
-os.environ["QT_AUTO_SCREEN_SCALE_FACTOR"] = "1"
-os.environ["QT_ENABLE_HIGHDPI_SCALING"] = "1"
-
-# Configure pyqtgraph for high-visibility outdoor daylight mode
-pg.setConfigOption('background', 'w')       # White plot background
-pg.setConfigOption('foreground', 'k')       # Black axes and text
-pg.setConfigOption('antialias', False)      # Optimize render speed over X11
+# Conditional ROS 2 Import
+try:
+    import rclpy
+    from rclpy.node import Node
+    from std_msgs.msg import String
+    ROS2_AVAILABLE = True
+except ImportError:
+    ROS2_AVAILABLE = False
 
 
-class BaseRotationIndicator(QWidget):
-    """Custom circular ring visualizer highlighting CW/CCW base rotation direction."""
-    def __init__(self, title="BASE ROTATION"):
+class GroundStationApp(QMainWindow):
+    def __init__(self):
         super().__init__()
-        self.title = title
-        self.direction = 0  # 0: Idle, 1: CW (Right), -1: CCW (Left)
-        self.setMinimumSize(110, 110)
+        self.setWindowTitle("AXIOM Ground Station - Rover Arm Control")
+        self.resize(1150, 780)
 
-    def set_direction(self, direction):
-        if self.direction != direction:
-            self.direction = direction
-            self.update()
+        # -------------------------------------------------------------------
+        # System States & Defaults
+        # -------------------------------------------------------------------
+        self.mode = "SIMULATED"  # Initial Mode: 'SIMULATED' or 'LIVE ROS 2'
 
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+        # Default Home Position: All Servos at 0.0° (Claw Open), Base Stopped
+        self.arm_angles = {
+            "lower_elbow": 0.0,  # Smraza 45KG (0° - 270°)
+            "upper_joint": 0.0,  # Miuzei 25KG (0° - 180°)
+            "wrist": 0.0,        # MG996R (0° - 180°)
+            "claw": 0.0,         # MG996R (0° = Open, 180° = Closed)
+            "base_dir": 0.0      # GM9 DC Motor (-1.0 to +1.0)
+        }
 
-        w, h = self.width(), self.height()
-        cx, cy = w / 2, h / 2 - 3
-        radius = min(w, h) / 2 - 25
+        # Telemetry Data Buffers for Real-Time Plotting
+        self.time_history = []
+        self.temp_history = []
+        self.pressure_history = []
+        self.alt_history = []
+        self.acc_x_history = []
+        self.acc_y_history = []
+        self.acc_z_history = []
+        self.max_data_points = 50
 
-        # Title at top
-        painter.setPen(QColor("#4A5568"))
-        font = painter.font()
-        font.setBold(True)
-        font.setPointSize(9)
-        painter.setFont(font)
-        painter.drawText(
-            self.rect().adjusted(0, 2, 0, 0),
-            Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter,
-            self.title
-        )
+        # -------------------------------------------------------------------
+        # ROS 2 Integration Setup
+        # -------------------------------------------------------------------
+        self.ros_node = None
+        self.ros_pub = None
+        self.ros_sub = None
 
-        circle_rect = QRectF(cx - radius, cy - radius, 2 * radius, 2 * radius)
+        if ROS2_AVAILABLE:
+            if not rclpy.ok():
+                rclpy.init()
+            self.ros_node = rclpy.create_node('ground_station_gui')
+            self.ros_pub = self.ros_node.create_publisher(String, '/rover/arm_commands', 10)
+            self.ros_sub = self.ros_node.create_subscription(
+                String, '/rover/telemetry', self.ros_telemetry_callback, 10
+            )
 
-        # Outer ring
-        painter.setPen(QPen(QColor("#718096"), 4))
-        painter.drawEllipse(circle_rect)
-
-        # Active direction semi-circle arc
-        if self.direction != 0:
-            active_pen = QPen(QColor("#00C853"), 6)
-            active_pen.setCapStyle(Qt.PenCapStyle.RoundCap)
-            painter.setPen(active_pen)
-
-            if self.direction == 1:
-                painter.drawArc(circle_rect, 90 * 16, -180 * 16)
-            elif self.direction == -1:
-                painter.drawArc(circle_rect, 90 * 16, 180 * 16)
-
-        # Status readout below
-        status_text = "CLOCKWISE" if self.direction == 1 else "COUNTER-CW" if self.direction == -1 else "IDLE"
-        painter.setPen(QColor("#00C853" if self.direction != 0 else "#718096"))
-        font.setPointSize(9)
-        painter.setFont(font)
-        painter.drawText(
-            self.rect(),
-            Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignHCenter,
-            status_text
-        )
-
-
-class JointVisualizer(QWidget):
-    """Custom circular dial visualizer supporting up to 270° joint angles."""
-    def __init__(self, title="JOINT", max_angle=180.0):
-        super().__init__()
-        self.title = title
-        self.max_angle = float(max_angle)
-        self.angle = 0.0
-        self.setMinimumSize(110, 110)
-
-    def set_angle(self, angle):
-        new_angle = max(0.0, min(self.max_angle, float(angle)))
-        if self.angle != new_angle:
-            self.angle = new_angle
-            self.update()
-
-    def paintEvent(self, event):
-        painter = QPainter(self)
-        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
-
-        w, h = self.width(), self.height()
-        cx, cy = w / 2, h / 2 - 3
-        radius = min(w, h) / 2 - 25
-
-        # Title
-        painter.setPen(QColor("#4A5568"))
-        font = painter.font()
-        font.setBold(True)
-        font.setPointSize(9)
-        painter.setFont(font)
-        painter.drawText(
-            self.rect().adjusted(0, 2, 0, 0),
-            Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter,
-            self.title
-        )
-
-        # Outer Ring
-        painter.setPen(QPen(QColor("#4A5568"), 3))
-        painter.drawEllipse(QPointF(cx, cy), radius, radius)
-
-        # Rotating Pointer Needle
-        painter.save()
-        painter.translate(cx, cy)
-        # Offset angle visual representation relative to center
-        painter.rotate(self.angle - (self.max_angle / 2.0))
-        painter.setPen(QPen(QColor("#00C853"), 4))
-        painter.drawLine(0, 0, 0, int(-radius + 4))
-        painter.restore()
-
-        # Readout
-        painter.setPen(QColor("#009624"))
-        font.setPointSize(10)
-        painter.setFont(font)
-        painter.drawText(
-            self.rect(),
-            Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignHCenter,
-            f"{self.angle:.1f}°"
-        )
-
-
-class GroundStationROSNode(Node):
-    """ROS 2 Node handling telemetry subscriptions and arm command publishing."""
-    def __init__(self, telemetry_callback):
-        super().__init__('axiom_ground_station')
-        self.telemetry_callback = telemetry_callback
-
-        self.sub_telemetry = self.create_subscription(
-            String, '/rover/telemetry', self.on_telemetry_received, 10
-        )
-        self.pub_commands = self.create_publisher(
-            String, '/rover/arm_commands', 10
-        )
-
-    def on_telemetry_received(self, msg):
-        try:
-            data = json.loads(msg.data)
-            if self.telemetry_callback:
-                self.telemetry_callback(data)
-        except json.JSONDecodeError:
-            self.get_logger().error("Received malformed JSON telemetry packet.")
-
-    def send_arm_command(self, cmd_dict):
-        msg = String()
-        msg.data = json.dumps(cmd_dict)
-        self.pub_commands.publish(msg)
-
-
-class GroundStationCanvas(QWidget):
-    """Main Ground Station GUI supporting 5-actuator control."""
-    def __init__(self, ros_node):
-        super().__init__()
-        self.ros_node = ros_node
-        self.setWindowTitle("AXIOM Ground Station - ROS 2 Humble")
-        self.resize(1200, 780)
-        self.setStyleSheet("background-color: #F2F4F7;")
-        self.setFocusPolicy(Qt.FocusPolicy.StrongFocus)
-
-        self.sim_mode = True
-
-        # Joint angle states
-        self.joint_base_dir = 0
-        self.joint_lower_elbow = 135.0  # Default center for 270° Smraza servo
-        self.joint_upper = 90.0         # Default center for 180° Miuzei servo
-        self.joint_wrist = 90.0         # Default center for 180° MG996R servo
-        self.joint_claw = 90.0          # Default center for 180° MG996R servo
-        self.pressed_keys = set()
-
-        # Telemetry plot data buffers
-        self.max_samples = 50
-        self.time_data = list(range(self.max_samples))
-        self.temp_data = [25.0] * self.max_samples
-        self.press_data = [980.0] * self.max_samples
-
-        self.csv_filename = f"telemetry_log_{time.strftime('%Y%m%d_%H%M%S')}.csv"
-        self.init_csv_log()
+        # Build UI Layout & Theme
         self.init_ui()
 
-        # Timers
-        self.ros_timer = QTimer(self)
-        self.ros_timer.timeout.connect(self.spin_ros)
-        self.ros_timer.start(30)
+        # Main Event Loop Timer (50 ms / 20 Hz)
+        self.timer = QTimer(self)
+        self.timer.timeout.connect(self.update_loop)
+        self.timer.start(50)
 
-        self.control_timer = QTimer(self)
-        self.control_timer.timeout.connect(self.process_control_inputs)
-        self.control_timer.start(33)
+        # Publish initial Home position (0° / Claw Open) on startup
+        self.publish_arm_commands()
 
-        self.mock_timer = QTimer(self)
-        self.mock_timer.timeout.connect(self.update_mock_telemetry)
-        self.mock_timer.start(1000)
-
-    def init_csv_log(self):
-        try:
-            with open(self.csv_filename, mode='w', newline='') as f:
-                writer = csv.writer(f)
-                writer.writerow(["timestamp", "temp_c", "pressure_hpa", "alt_m", "yaw", "pitch", "roll"])
-        except Exception as e:
-            print(f"Failed to initialize CSV log file: {e}")
-
+    # -----------------------------------------------------------------------
+    # UI Initialization & Styling
+    # -----------------------------------------------------------------------
     def init_ui(self):
-        main_layout = QVBoxLayout(self)
+        # Apply Dark Aesthetic Theme
+        self.setStyleSheet("""
+            QMainWindow { background-color: #181825; }
+            QGroupBox {
+                font-weight: bold;
+                border: 1px solid #313244;
+                border-radius: 8px;
+                margin-top: 10px;
+                padding-top: 10px;
+                background-color: #1e1e2e;
+                color: #cdd6f4;
+            }
+            QGroupBox::title {
+                subcontrol-origin: margin;
+                subcontrol-position: top left;
+                padding: 2px 8px;
+                color: #89b4fa;
+            }
+            QLabel { color: #cdd6f4; font-size: 13px; }
+            QFrame { border: none; }
+        """)
+
+        central_widget = QWidget()
+        self.setCentralWidget(central_widget)
+        main_layout = QVBoxLayout(central_widget)
         main_layout.setSpacing(10)
-        main_layout.setContentsMargins(12, 12, 12, 12)
+        main_layout.setContentsMargins(15, 15, 15, 15)
 
-        top_layout = QHBoxLayout()
-        top_layout.setSpacing(10)
+        # 1. Header Bar
+        main_layout.addWidget(self.create_header())
 
-        # Left Control Panel
-        left_panel = QFrame()
-        left_panel.setStyleSheet("QFrame { background-color: #FFFFFF; border: 2px solid #C0C4CC; border-radius: 8px; padding: 8px; }")
-        left_layout = QVBoxLayout(left_panel)
+        # 2. Arm Status & Angle Readout Panel
+        main_layout.addWidget(self.create_arm_panel())
 
-        ctrl_heading = QLabel("ARM CONTROLS")
-        ctrl_heading.setStyleSheet("color: #000000; font-size: 13px; font-weight: bold; padding-bottom: 2px;")
-        left_layout.addWidget(ctrl_heading, alignment=Qt.AlignmentFlag.AlignHCenter)
+        # 3. Telemetry Plotting Dashboard (pyqtgraph)
+        main_layout.addWidget(self.create_telemetry_plots())
 
-        self.lbl_mode = QLabel("MODE: SIMULATED (Press 'T' for Live ROS 2)")
-        self.lbl_mode.setStyleSheet("color: #D32F2F; font-weight: bold; font-size: 10px; background: #FFEBEE; padding: 4px; border-radius: 4px;")
-        self.lbl_mode.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        left_layout.addWidget(self.lbl_mode)
+        # 4. Live Metric Summary Cards
+        main_layout.addWidget(self.create_metrics_bar())
 
-        instructions = (
-            "<b>BASE (GM9 DC):</b> A / D<br>"
-            "<b>LOWER ELBOW (45KG 270°):</b> W / S<br>"
-            "<b>UPPER JOINT (25KG 180°):</b> I / K<br>"
-            "<b>WRIST TWIST (MG996R):</b> J / L<br>"
-            "<b>CLAW OPEN/CLOSE (MG996R):</b> U / O<br><br>"
-            "<i>Hold key for continuous movement.<br>"
-            "Press <b>R</b> to Reset Position.<br>"
-            "Press <b>T</b> to Toggle Sim / Live Mode.</i>"
+        # 5. Keyboard Shortcut Guide Footer
+        main_layout.addWidget(self.create_footer_legend())
+
+    def create_header(self):
+        header_frame = QFrame()
+        header_layout = QHBoxLayout(header_frame)
+        header_layout.setContentsMargins(0, 0, 0, 0)
+
+        title = QLabel("AXIOM ROVER GROUND STATION")
+        title.setFont(QFont("Arial", 16, QFont.Weight.Bold))
+        title.setStyleSheet("color: #cba6f7;")
+
+        self.mode_label = QLabel(f"MODE: {self.mode}")
+        self.mode_label.setFont(QFont("Arial", 13, QFont.Weight.Bold))
+        self.update_mode_banner_style()
+
+        header_layout.addWidget(title)
+        header_layout.addStretch()
+        header_layout.addWidget(self.mode_label)
+        return header_frame
+
+    def create_arm_panel(self):
+        group = QGroupBox("ARM ACTUATOR LIVE READOUTS & TELEMETRY")
+        layout = QGridLayout(group)
+
+        self.joint_labels = {}
+        joints = [
+            ("Lower Elbow (GP0):", "lower_elbow", "0.0°"),
+            ("Upper Joint (GP1):", "upper_joint", "0.0°"),
+            ("Wrist Twist (GP4):", "wrist", "0.0°"),
+            ("Claw State (GP12):", "claw", "0.0° (OPEN)"),
+            ("Base Motor (GP6/7/11):", "base_dir", "0.0 (STOPPED)")
+        ]
+
+        for idx, (name, key, default_str) in enumerate(joints):
+            lbl_name = QLabel(name)
+            lbl_name.setStyleSheet("color: #a6adc8; font-weight: bold;")
+            lbl_val = QLabel(default_str)
+            lbl_val.setStyleSheet("color: #a6e3a1; font-weight: bold; font-size: 14px;")
+            self.joint_labels[key] = lbl_val
+
+            col = (idx % 3) * 2
+            row = idx // 3
+            layout.addWidget(lbl_name, row, col)
+            layout.addWidget(lbl_val, row, col + 1)
+
+        return group
+
+    def create_telemetry_plots(self):
+        pg.setConfigOption('background', '#1e1e2e')
+        pg.setConfigOption('foreground', '#cdd6f4')
+
+        plot_layout = QHBoxLayout()
+
+        # BMP388 Environmental Plot
+        self.bmp_plot = pg.PlotWidget(title="BMP388 Environmental Telemetry")
+        self.bmp_plot.showGrid(x=True, y=True, alpha=0.3)
+        self.bmp_plot.addLegend()
+        self.curve_temp = self.bmp_plot.plot(pen=pg.mkPen('#f38ba8', width=2), name="Temp (°C)")
+        self.curve_press = self.bmp_plot.plot(pen=pg.mkPen('#89b4fa', width=2), name="Pressure (hPa / 10)")
+        self.curve_alt = self.bmp_plot.plot(pen=pg.mkPen('#a6e3a1', width=2), name="Alt (m)")
+
+        # BNO055 Acceleration Plot
+        self.bno_plot = pg.PlotWidget(title="BNO055 3-Axis Acceleration")
+        self.bno_plot.showGrid(x=True, y=True, alpha=0.3)
+        self.bno_plot.addLegend()
+        self.curve_acc_x = self.bno_plot.plot(pen=pg.mkPen('#fab387', width=2), name="Acc X (m/s²)")
+        self.curve_acc_y = self.bno_plot.plot(pen=pg.mkPen('#f9e2af', width=2), name="Acc Y (m/s²)")
+        self.curve_acc_z = self.bno_plot.plot(pen=pg.mkPen('#94e2d5', width=2), name="Acc Z (m/s²)")
+
+        plot_layout.addWidget(self.bmp_plot)
+        plot_layout.addWidget(self.bno_plot)
+
+        container = QFrame()
+        container.setLayout(plot_layout)
+        return container
+
+    def create_metrics_bar(self):
+        group = QGroupBox("SENSOR METRICS SUMMARY")
+        layout = QHBoxLayout(group)
+
+        self.card_temp = QLabel("Temp: -- °C")
+        self.card_press = QLabel("Pressure: -- hPa")
+        self.card_alt = QLabel("Altitude: -- m")
+        self.card_acc = QLabel("Acc (X,Y,Z): --, --, --")
+
+        for card in [self.card_temp, self.card_press, self.card_alt, self.card_acc]:
+            card.setStyleSheet("""
+                background-color: #313244;
+                border-radius: 6px;
+                padding: 8px;
+                font-weight: bold;
+                color: #89b4fa;
+            """)
+            layout.addWidget(card)
+
+        return group
+
+    def create_footer_legend(self):
+        footer = QLabel(
+            "KEYBOARD CONTROLS:  [W/S] Elbow  |  [I/K] Upper Joint  |  [J/L] Wrist  |  "
+            "[U/O] Claw (Open/Close)  |  [A/D] Base Motor  |  [R] Zero/Home Arm  |  [T] Toggle Mode"
         )
-        lbl_ctrls = QLabel(instructions)
-        lbl_ctrls.setStyleSheet("color: #1A1D20; font-size: 11px; border: 1px solid #DCDFE6; background: #F8F9FA; padding: 6px; border-radius: 4px;")
-        left_layout.addWidget(lbl_ctrls)
+        footer.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        footer.setStyleSheet("color: #7f849c; font-weight: bold; font-size: 12px; padding: 4px;")
+        return footer
 
-        lbl_walle = QLabel()
-        pixmap_walle = QPixmap("walle.png")
-        if not pixmap_walle.isNull():
-            lbl_walle.setPixmap(pixmap_walle.scaledToWidth(180, Qt.TransformationMode.SmoothTransformation))
-            lbl_walle.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            lbl_walle.setStyleSheet("border: none; background: transparent; padding-top: 4px;")
-            left_layout.addWidget(lbl_walle, alignment=Qt.AlignmentFlag.AlignCenter)
+    # -----------------------------------------------------------------------
+    # ROS 2 & Command Publishing Logic
+    # -----------------------------------------------------------------------
+    def publish_arm_commands(self):
+        """Publishes the current arm command JSON payload over ROS 2."""
+        if ROS2_AVAILABLE and self.ros_pub:
+            msg = String()
+            msg.data = json.dumps(self.arm_angles)
+            self.ros_pub.publish(msg)
 
-        btn_reset = QPushButton("RESET POSITION")
-        btn_reset.setFocusPolicy(Qt.FocusPolicy.NoFocus)
-        btn_reset.setStyleSheet("QPushButton { background-color: #D32F2F; color: #FFFFFF; font-weight: bold; font-size: 11px; padding: 8px; border-radius: 4px; border: none; } QPushButton:hover { background-color: #B71C1C; }")
-        btn_reset.clicked.connect(self.reset_arm_position)
-        left_layout.addWidget(btn_reset)
+    def ros_telemetry_callback(self, msg):
+        """Processes incoming ROS 2 telemetry when in LIVE ROS 2 mode."""
+        if self.mode == "LIVE ROS 2":
+            try:
+                payload = json.loads(msg.data)
+                self.process_telemetry_payload(payload)
+            except Exception as e:
+                print(f"[ERROR] Failed to parse ROS 2 telemetry JSON: {e}")
 
-        left_layout.addStretch()
-        top_layout.addWidget(left_panel, stretch=1)
+    # -----------------------------------------------------------------------
+    # Main Event Loop & Telemetry Generator
+    # -----------------------------------------------------------------------
+    def update_loop(self):
+        # 1. Spin ROS 2 Node (if active)
+        if ROS2_AVAILABLE and self.ros_node:
+            rclpy.spin_once(self.ros_node, timeout_sec=0.001)
 
-        # Right Panel
-        right_panel = QVBoxLayout()
-        viz_header = QLabel("JOINT KINEMATIC DISPLAY")
-        viz_header.setStyleSheet("color: #007A33; font-size: 14px; font-weight: bold;")
-        right_panel.addWidget(viz_header, alignment=Qt.AlignmentFlag.AlignHCenter)
-
-        dials_grid = QGridLayout()
-        dials_grid.setSpacing(10)
-
-        self.viz_base = BaseRotationIndicator("BASE ROTATION")
-        self.viz_elbow = JointVisualizer("ELBOW (270°)", max_angle=270.0)
-        self.viz_upper = JointVisualizer("UPPER JOINT (180°)", max_angle=180.0)
-        self.viz_wrist = JointVisualizer("WRIST / CLAW (180°)", max_angle=180.0)
-
-        dials_grid.addWidget(self.viz_base, 0, 0)
-        dials_grid.addWidget(self.viz_elbow, 0, 1)
-        dials_grid.addWidget(self.viz_upper, 1, 0)
-        dials_grid.addWidget(self.viz_wrist, 1, 1)
-
-        right_panel.addLayout(dials_grid)
-        self.update_dial_visualizers()
-
-        # Plots
-        charts_layout = QHBoxLayout()
-        self.plot_temp = pg.PlotWidget(title="<b>Temperature (°C)</b>")
-        self.plot_temp.showGrid(x=True, y=True, alpha=0.3)
-        self.curve_temp = self.plot_temp.plot(pen=pg.mkPen(color='#D32F2F', width=2))
-
-        self.plot_press = pg.PlotWidget(title="<b>Pressure (hPa)</b>")
-        self.plot_press.showGrid(x=True, y=True, alpha=0.3)
-        self.curve_press = self.plot_press.plot(pen=pg.mkPen(color='#0288D1', width=2))
-
-        charts_layout.addWidget(self.plot_temp)
-        charts_layout.addWidget(self.plot_press)
-        right_panel.addLayout(charts_layout)
-
-        self.lbl_telemetry = QLabel("TIME: --:--:--")
-        self.lbl_telemetry.setStyleSheet("color: #007A33; font-family: monospace; font-size: 13px; font-weight: bold; padding: 2px;")
-        right_panel.addWidget(self.lbl_telemetry)
-
-        top_layout.addLayout(right_panel, stretch=3)
-        main_layout.addLayout(top_layout, stretch=3)
-
-        # Bottom Sensor Display Cards
-        bottom_panel = QFrame()
-        bottom_panel.setStyleSheet("background-color: #FFFFFF; border: 2px solid #C0C4CC; border-radius: 8px; padding: 10px;")
-        bottom_layout = QVBoxLayout(bottom_panel)
-        reserved_label = QLabel("LIVE SENSOR READINGS")
-        reserved_label.setStyleSheet("color: #000000; font-size: 12px; font-weight: bold;")
-        bottom_layout.addWidget(reserved_label, alignment=Qt.AlignmentFlag.AlignLeft)
-
-        grid_sensor = QGridLayout()
-        grid_sensor.setSpacing(10)
-
-        def create_metric_card(title_text):
-            card = QFrame()
-            card.setStyleSheet("background-color: #F8F9FA; border: 1.5px solid #000000; border-radius: 6px;")
-            c_layout = QVBoxLayout(card)
-            c_layout.setContentsMargins(8, 6, 8, 6)
-            lbl_title = QLabel(title_text)
-            lbl_title.setStyleSheet("color: #4A5568; font-size: 11px; font-weight: bold;")
-            lbl_val = QLabel("--")
-            lbl_val.setStyleSheet("color: #000000; font-size: 15px; font-weight: bold; font-family: monospace;")
-            lbl_val.setAlignment(Qt.AlignmentFlag.AlignCenter)
-            c_layout.addWidget(lbl_title, alignment=Qt.AlignmentFlag.AlignHCenter)
-            c_layout.addWidget(lbl_val, alignment=Qt.AlignmentFlag.AlignHCenter)
-            return card, lbl_val
-
-        card_temp, self.lbl_val_temp = create_metric_card("TEMPERATURE")
-        card_press, self.lbl_val_press = create_metric_card("PRESSURE")
-        card_alt, self.lbl_val_alt = create_metric_card("ALTITUDE")
-        card_yaw, self.lbl_val_yaw = create_metric_card("ACCEL X")
-        card_pitch, self.lbl_val_pitch = create_metric_card("ACCEL Y")
-        card_roll, self.lbl_val_roll = create_metric_card("ACCEL Z")
-
-        grid_sensor.addWidget(card_temp, 0, 0)
-        grid_sensor.addWidget(card_press, 0, 1)
-        grid_sensor.addWidget(card_alt, 0, 2)
-        grid_sensor.addWidget(card_yaw, 0, 3)
-        grid_sensor.addWidget(card_pitch, 0, 4)
-        grid_sensor.addWidget(card_roll, 0, 5)
-
-        bottom_layout.addLayout(grid_sensor)
-        main_layout.addWidget(bottom_panel, stretch=1)
-
-    def keyPressEvent(self, event):
-        self.pressed_keys.add(event.key())
-        if event.key() == Qt.Key.Key_R:
-            self.reset_arm_position()
-        elif event.key() == Qt.Key.Key_T:
-            self.toggle_mode()
-
-    def keyReleaseEvent(self, event):
-        self.pressed_keys.discard(event.key())
-
-    def toggle_mode(self):
-        self.sim_mode = not self.sim_mode
-        if self.sim_mode:
-            self.lbl_mode.setText("MODE: SIMULATED (Press 'T' for Live ROS 2)")
-            self.lbl_mode.setStyleSheet("color: #D32F2F; font-weight: bold; font-size: 10px; background: #FFEBEE; padding: 4px; border-radius: 4px;")
-        else:
-            self.lbl_mode.setText("MODE: LIVE ROS 2 (Press 'T' for Simulation)")
-            self.lbl_mode.setStyleSheet("color: #007A33; font-weight: bold; font-size: 10px; background: #E8F5E9; padding: 4px; border-radius: 4px;")
-
-    def process_control_inputs(self):
-        step = 1.5
-        moved = False
-
-        # Base GM9 Motor Controls
-        if Qt.Key.Key_A in self.pressed_keys:
-            self.joint_base_dir = -1
-            moved = True
-        elif Qt.Key.Key_D in self.pressed_keys:
-            self.joint_base_dir = 1
-            moved = True
-        else:
-            self.joint_base_dir = 0
-
-        # Lower Elbow Servo (Smraza 45KG: 0 - 270°)
-        if Qt.Key.Key_W in self.pressed_keys:
-            self.joint_lower_elbow = min(270.0, self.joint_lower_elbow + step)
-            moved = True
-        if Qt.Key.Key_S in self.pressed_keys:
-            self.joint_lower_elbow = max(0.0, self.joint_lower_elbow - step)
-            moved = True
-
-        # Upper Joint Servo (Miuzei 25KG: 0 - 180°)
-        if Qt.Key.Key_I in self.pressed_keys:
-            self.joint_upper = min(180.0, self.joint_upper + step)
-            moved = True
-        if Qt.Key.Key_K in self.pressed_keys:
-            self.joint_upper = max(0.0, self.joint_upper - step)
-            moved = True
-
-        # Wrist Twist Servo (MG996R: 0 - 180°)
-        if Qt.Key.Key_J in self.pressed_keys:
-            self.joint_wrist = max(0.0, self.joint_wrist - step)
-            moved = True
-        if Qt.Key.Key_L in self.pressed_keys:
-            self.joint_wrist = min(180.0, self.joint_wrist + step)
-            moved = True
-
-        # Claw Open/Close Servo (MG996R: 0 - 180°)
-        if Qt.Key.Key_U in self.pressed_keys:
-            self.joint_claw = min(180.0, self.joint_claw + step)
-            moved = True
-        if Qt.Key.Key_O in self.pressed_keys:
-            self.joint_claw = max(0.0, self.joint_claw - step)
-            moved = True
-
-        self.update_dial_visualizers()
-
-        if moved:
-            cmd = {
-                "lower_elbow": self.joint_lower_elbow,
-                "upper_joint": self.joint_upper,
-                "wrist": self.joint_wrist,
-                "claw": self.joint_claw,
-                "base_dir": self.joint_base_dir
+        # 2. Handle Simulation Mode Telemetry Generation
+        if self.mode == "SIMULATED":
+            t = time.time()
+            mock_payload = {
+                "timestamp": datetime.now().strftime("%H:%M:%S"),
+                "bmp388": {
+                    "temp_c": round(24.5 + math.sin(t * 0.5) * 1.5 + random.uniform(-0.1, 0.1), 2),
+                    "pressure_hpa": round(1013.25 + math.cos(t * 0.2) * 4.0 + random.uniform(-0.3, 0.3), 2),
+                    "alt_m": round(95.0 + math.sin(t * 0.1) * 2.0 + random.uniform(-0.2, 0.2), 2)
+                },
+                "bno055": {
+                    "acc_x": round(random.uniform(-0.15, 0.15), 2),
+                    "acc_y": round(random.uniform(-0.15, 0.15), 2),
+                    "acc_z": round(9.81 + random.uniform(-0.08, 0.08), 2)
+                }
             }
-            self.ros_node.send_arm_command(cmd)
+            self.process_telemetry_payload(mock_payload)
 
-    def update_dial_visualizers(self):
-        self.viz_base.set_direction(self.joint_base_dir)
-        self.viz_elbow.set_angle(self.joint_lower_elbow)
-        self.viz_upper.set_angle(self.joint_upper)
-        self.viz_wrist.set_angle(self.joint_wrist)
+    def process_telemetry_payload(self, data):
+        """Updates internal buffers, graphs, and metric cards from telemetry."""
+        bmp = data.get("bmp388", {})
+        bno = data.get("bno055", {})
 
-    def reset_arm_position(self):
-        self.joint_base_dir = 0
-        self.joint_lower_elbow = 135.0
-        self.joint_upper = 90.0
-        self.joint_wrist = 90.0
-        self.joint_claw = 90.0
-        self.pressed_keys.clear()
-        self.update_dial_visualizers()
+        temp = bmp.get("temp_c", 0.0)
+        press = bmp.get("pressure_hpa", 0.0)
+        alt = bmp.get("alt_m", 0.0)
+        acc_x = bno.get("acc_x", 0.0)
+        acc_y = bno.get("acc_y", 0.0)
+        acc_z = bno.get("acc_z", 0.0)
 
-        cmd = {
-            "lower_elbow": 135.0,
-            "upper_joint": 90.0,
-            "wrist": 90.0,
-            "claw": 90.0,
-            "base_dir": 0
-        }
-        self.ros_node.send_arm_command(cmd)
+        # Maintain Fixed-Length History Buffers
+        self.time_history.append(time.time())
+        self.temp_history.append(temp)
+        self.pressure_history.append(press / 10.0)  # Scaled for graph visibility
+        self.alt_history.append(alt)
+        self.acc_x_history.append(acc_x)
+        self.acc_y_history.append(acc_y)
+        self.acc_z_history.append(acc_z)
 
-    def spin_ros(self):
-        rclpy.spin_once(self.ros_node, timeout_sec=0)
+        if len(self.time_history) > self.max_data_points:
+            self.time_history.pop(0)
+            self.temp_history.pop(0)
+            self.pressure_history.pop(0)
+            self.alt_history.pop(0)
+            self.acc_x_history.pop(0)
+            self.acc_y_history.pop(0)
+            self.acc_z_history.pop(0)
 
-    def render_telemetry_data(self, data):
-        current_ts = data.get("timestamp", time.strftime("%Y/%m/%d %H:%M:%S"))
-        self.lbl_telemetry.setText(f"TIME: {current_ts}")
+        # Update pyqtgraph Curves
+        x_vals = list(range(len(self.time_history)))
+        self.curve_temp.setData(x_vals, self.temp_history)
+        self.curve_press.setData(x_vals, self.pressure_history)
+        self.curve_alt.setData(x_vals, self.alt_history)
+        self.curve_acc_x.setData(x_vals, self.acc_x_history)
+        self.curve_acc_y.setData(x_vals, self.acc_y_history)
+        self.curve_acc_z.setData(x_vals, self.acc_z_history)
 
-        temp_val, press_val, alt_val = "", "", ""
-        acc_x, acc_y, acc_z = "", "", ""
+        # Update Summary Cards
+        self.card_temp.setText(f"Temp: {temp:.2f} °C")
+        self.card_press.setText(f"Pressure: {press:.2f} hPa")
+        self.card_alt.setText(f"Altitude: {alt:.2f} m")
+        self.card_acc.setText(f"Acc (X,Y,Z): {acc_x:.1f}, {acc_y:.1f}, {acc_z:.1f} m/s²")
 
-        if "bmp388" in data:
-            bmp = data["bmp388"]
-            temp = bmp.get('temp_c')
-            press = bmp.get('pressure_hpa')
-            alt = bmp.get('alt_m')
+    # -----------------------------------------------------------------------
+    # Keyboard Interaction & Mode Switching
+    # -----------------------------------------------------------------------
+    def keyPressEvent(self, event: QKeyEvent):
+        key = event.key()
+        step = 5.0  # Angle increment per keystroke
 
-            if temp is not None:
-                temp_val = f"{float(temp):.2f}"
-                self.lbl_val_temp.setText(f"{temp:.1f} °C")
-                self.temp_data = self.temp_data[1:] + [float(temp)]
-                self.curve_temp.setData(self.time_data, self.temp_data)
+        # [T] Toggle Mode
+        if key == Qt.Key.Key_T:
+            self.mode = "LIVE ROS 2" if self.mode == "SIMULATED" else "SIMULATED"
+            self.update_mode_banner_style()
 
-            if press is not None:
-                press_val = f"{float(press):.2f}"
-                self.lbl_val_press.setText(f"{press:.1f} hPa")
-                self.press_data = self.press_data[1:] + [float(press)]
-                self.curve_press.setData(self.time_data, self.press_data)
+        # [R] Reset to Home Position (0.0° / Claw Open)
+        elif key == Qt.Key.Key_R:
+            self.arm_angles["lower_elbow"] = 0.0
+            self.arm_angles["upper_joint"] = 0.0
+            self.arm_angles["wrist"] = 0.0
+            self.arm_angles["claw"] = 0.0
+            self.arm_angles["base_dir"] = 0.0
+            self.publish_arm_commands()
 
-            if alt is not None:
-                alt_val = f"{float(alt):.2f}"
-                self.lbl_val_alt.setText(f"{alt:.2f} m")
+        # [W / S] Lower Elbow (0° - 270°)
+        elif key == Qt.Key.Key_W:
+            self.arm_angles["lower_elbow"] = min(270.0, self.arm_angles["lower_elbow"] + step)
+            self.publish_arm_commands()
+        elif key == Qt.Key.Key_S:
+            self.arm_angles["lower_elbow"] = max(0.0, self.arm_angles["lower_elbow"] - step)
+            self.publish_arm_commands()
 
-        if "bno055" in data:
-            bno = data["bno055"]
-            if "acc_x" in bno and bno['acc_x'] is not None:
-                acc_x = f"{float(bno['acc_x']):.2f}"
-                self.lbl_val_yaw.setText(f"{bno['acc_x']:.2f}")
-            if "acc_y" in bno and bno['acc_y'] is not None:
-                acc_y = f"{float(bno['acc_y']):.2f}"
-                self.lbl_val_pitch.setText(f"{bno['acc_y']:.2f}")
-            if "acc_z" in bno and bno['acc_z'] is not None:
-                acc_z = f"{float(bno['acc_z']):.2f}"
-                self.lbl_val_roll.setText(f"{bno['acc_z']:.2f}")
+        # [I / K] Upper Joint (0° - 180°)
+        elif key == Qt.Key.Key_I:
+            self.arm_angles["upper_joint"] = min(180.0, self.arm_angles["upper_joint"] + step)
+            self.publish_arm_commands()
+        elif key == Qt.Key.Key_K:
+            self.arm_angles["upper_joint"] = max(0.0, self.arm_angles["upper_joint"] - step)
+            self.publish_arm_commands()
 
-        try:
-            with open(self.csv_filename, mode='a', newline='') as f:
-                writer = csv.writer(f)
-                writer.writerow([current_ts, temp_val, press_val, alt_val, acc_x, acc_y, acc_z])
-        except Exception:
-            pass
+        # [J / L] Wrist Twist (0° - 180°)
+        elif key == Qt.Key.Key_L:
+            self.arm_angles["wrist"] = min(180.0, self.arm_angles["wrist"] + step)
+            self.publish_arm_commands()
+        elif key == Qt.Key.Key_J:
+            self.arm_angles["wrist"] = max(0.0, self.arm_angles["wrist"] - step)
+            self.publish_arm_commands()
 
-    def update_telemetry_ui(self, data):
-        if not self.sim_mode:
-            self.render_telemetry_data(data)
+        # [U / O] Claw Control (0° = Open, 180° = Closed)
+        elif key == Qt.Key.Key_O:
+            self.arm_angles["claw"] = min(180.0, self.arm_angles["claw"] + step)  # Close
+            self.publish_arm_commands()
+        elif key == Qt.Key.Key_U:
+            self.arm_angles["claw"] = max(0.0, self.arm_angles["claw"] - step)  # Open
+            self.publish_arm_commands()
 
-    def update_mock_telemetry(self):
-        if not self.sim_mode:
-            return
+        # [A / D] Base DC Motor Direction (-1.0 to +1.0)
+        elif key == Qt.Key.Key_D:
+            self.arm_angles["base_dir"] = min(1.0, round(self.arm_angles["base_dir"] + 0.2, 1))
+            self.publish_arm_commands()
+        elif key == Qt.Key.Key_A:
+            self.arm_angles["base_dir"] = max(-1.0, round(self.arm_angles["base_dir"] - 0.2, 1))
+            self.publish_arm_commands()
 
-        current_time = time.strftime("%Y/%m/%d %H:%M:%S")
-        t = time.time()
+        self.update_angle_displays()
 
-        mock_data = {
-            "timestamp": current_time,
-            "bmp388": {
-                "temp_c": 25.0 + 2.0 * math.sin(t / 8.0),
-                "pressure_hpa": 980.0 + 5.0 * math.cos(t / 12.0),
-                "alt_m": 94.2 + 0.5 * math.sin(t / 15.0)
-            },
-            "bno055": {
-                "acc_x": 0.1 * math.sin(t),
-                "acc_y": 0.05 * math.cos(t),
-                "acc_z": 9.81
-            }
-        }
-        self.render_telemetry_data(mock_data)
+    def update_angle_displays(self):
+        """Reflects current angle values on UI readouts."""
+        self.joint_labels["lower_elbow"].setText(f"{self.arm_angles['lower_elbow']:.1f}°")
+        self.joint_labels["upper_joint"].setText(f"{self.arm_angles['upper_joint']:.1f}°")
+        self.joint_labels["wrist"].setText(f"{self.arm_angles['wrist']:.1f}°")
+
+        claw_deg = self.arm_angles["claw"]
+        claw_status = "OPEN" if claw_deg == 0.0 else f"{claw_deg:.1f}°"
+        self.joint_labels["claw"].setText(f"{claw_deg:.1f}° ({claw_status})")
+
+        base_val = self.arm_angles["base_dir"]
+        base_status = "STOPPED" if base_val == 0.0 else ("RIGHT" if base_val > 0 else "LEFT")
+        self.joint_labels["base_dir"].setText(f"{base_val:.1f} ({base_status})")
+
+    def update_mode_banner_style(self):
+        self.mode_label.setText(f"MODE: {self.mode}")
+        if self.mode == "LIVE ROS 2":
+            self.mode_label.setStyleSheet("""
+                background-color: #a6e3a1; color: #11111b;
+                padding: 4px 12px; border-radius: 6px; font-weight: bold;
+            """)
+        else:
+            self.mode_label.setStyleSheet("""
+                background-color: #f9e2af; color: #11111b;
+                padding: 4px 12px; border-radius: 6px; font-weight: bold;
+            """)
+
+    def closeEvent(self, event):
+        """Clean shutdown handler."""
+        if ROS2_AVAILABLE and self.ros_node:
+            self.ros_node.destroy_node()
+            rclpy.shutdown()
+        event.accept()
 
 
+# ---------------------------------------------------------------------------
+# Application Entry Point
+# ---------------------------------------------------------------------------
 def main():
-    rclpy.init()
     app = QApplication(sys.argv)
-    ros_node = GroundStationROSNode(telemetry_callback=None)
-    gui = GroundStationCanvas(ros_node)
-    ros_node.telemetry_callback = gui.update_telemetry_ui
-
+    gui = GroundStationApp()
     gui.show()
-    exit_code = app.exec()
-
-    ros_node.destroy_node()
-    rclpy.shutdown()
-    sys.exit(exit_code)
+    sys.exit(app.exec())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
