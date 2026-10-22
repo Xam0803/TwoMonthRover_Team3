@@ -1,0 +1,285 @@
+[0.000000] (-) TimerEvent: {}
+[0.001305] (rover_comms) JobQueued: {'identifier': 'rover_comms', 'dependencies': OrderedDict()}
+[0.001480] (rover_pkg) JobQueued: {'identifier': 'rover_pkg', 'dependencies': OrderedDict({'rover_comms': '/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms'})}
+[0.002536] (rover_comms) JobStarted: {'identifier': 'rover_comms'}
+[0.043283] (rover_comms) JobProgress: {'identifier': 'rover_comms', 'progress': 'cmake'}
+[0.046566] (rover_comms) JobProgress: {'identifier': 'rover_comms', 'progress': 'build'}
+[0.049992] (rover_comms) Command: {'cmd': ['/usr/bin/cmake', '--build', '/home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_comms', '--', '-j4', '-l4'], 'cwd': '/home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_comms', 'env': OrderedDict({'LESSOPEN': '| /usr/bin/lesspipe %s', 'LANGUAGE': 'en_US.UTF-8', 'USER': 'rover3', 'SSH_CLIENT': '10.86.242.255 53864 22', 'XDG_SESSION_TYPE': 'tty', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/opt/ros/jazzy/lib/aarch64-linux-gnu:/opt/ros/jazzy/lib', 'HOME': '/home/rover3', 'OLDPWD': '/home/rover3/TwoMonthRover_Team3/ros2_ws/src', 'SSH_TTY': '/dev/pts/2', 'ROS_PYTHON_VERSION': '3', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'COLCON_PREFIX_PATH': '/home/rover3/TwoMonthRover_Team3/ros2_ws/install', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'rover3', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'XDG_SESSION_CLASS': 'user', 'TERM': 'foot', 'XDG_SESSION_ID': '11', 'PATH': '/opt/ros/jazzy/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin', 'XDG_RUNTIME_DIR': '/run/user/1000', 'LANG': 'en_US.UTF-8', 'LS_COLORS': '', 'AMENT_PREFIX_PATH': '/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg:/opt/ros/jazzy', 'LC_MESSAGES': 'en_US.UTF-8', 'SHELL': '/bin/bash', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'PWD': '/home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_comms', 'SSH_CONNECTION': '10.86.242.255 53864 10.86.39.76 22', 'PYTHONPATH': '/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/python3.12/site-packages:/opt/ros/jazzy/lib/python3.12/site-packages', 'COLCON': '1', 'CMAKE_PREFIX_PATH': '/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg:/opt/ros/jazzy'}), 'shell': False}
+[0.098967] (-) TimerEvent: {}
+[0.200036] (-) TimerEvent: {}
+[0.290308] (rover_comms) StdoutLine: {'line': b'[  2%] Built target rover_comms__rosidl_generator_type_description\n'}
+[0.296861] (rover_comms) StdoutLine: {'line': b'[  5%] Built target rover_comms__rs\n'}
+[0.300399] (-) TimerEvent: {}
+[0.336119] (rover_comms) StdoutLine: {'line': b'[  5%] Built target ament_cmake_python_copy_rover_comms\n'}
+[0.389269] (rover_comms) StdoutLine: {'line': b'[  8%] Built target rover_comms__cpp\n'}
+[0.396774] (rover_comms) StdoutLine: {'line': b'[ 22%] Built target rover_comms__rosidl_generator_c\n'}
+[0.400663] (-) TimerEvent: {}
+[0.504547] (-) TimerEvent: {}
+[0.512069] (rover_comms) StdoutLine: {'line': b'[ 31%] Built target rover_comms__rosidl_typesupport_introspection_c\n'}
+[0.513943] (rover_comms) StdoutLine: {'line': b'[ 40%] Built target rover_comms__rosidl_typesupport_fastrtps_c\n'}
+[0.520140] (rover_comms) StdoutLine: {'line': b'[ 48%] Built target rover_comms__rosidl_typesupport_fastrtps_cpp\n'}
+[0.608682] (-) TimerEvent: {}
+[0.632715] (rover_comms) StdoutLine: {'line': b'[ 57%] Built target rover_comms__rosidl_typesupport_c\n'}
+[0.640096] (rover_comms) StdoutLine: {'line': b'[ 65%] Built target rover_comms__rosidl_typesupport_introspection_cpp\n'}
+[0.649787] (rover_comms) StdoutLine: {'line': b'[ 74%] Built target rover_comms__rosidl_typesupport_cpp\n'}
+[0.708891] (-) TimerEvent: {}
+[0.745181] (rover_comms) StdoutLine: {'line': b'[ 74%] Built target rover_comms\n'}
+[0.809120] (-) TimerEvent: {}
+[0.844331] (rover_comms) StdoutLine: {'line': b'[ 77%] Built target rover_comms__py\n'}
+[0.909357] (-) TimerEvent: {}
+[0.952509] (rover_comms) StdoutLine: {'line': b'[ 82%] Built target rover_comms__rosidl_generator_py\n'}
+[1.012561] (-) TimerEvent: {}
+[1.068795] (rover_comms) StdoutLine: {'line': b'[ 88%] Built target rover_comms_s__rosidl_typesupport_introspection_c\n'}
+[1.069879] (rover_comms) StdoutLine: {'line': b'[ 94%] Built target rover_comms_s__rosidl_typesupport_c\n'}
+[1.075028] (rover_comms) StdoutLine: {'line': b'[100%] Built target rover_comms_s__rosidl_typesupport_fastrtps_c\n'}
+[1.112781] (-) TimerEvent: {}
+[1.213674] (-) TimerEvent: {}
+[1.314505] (-) TimerEvent: {}
+[1.415312] (-) TimerEvent: {}
+[1.516123] (-) TimerEvent: {}
+[1.554801] (rover_comms) StdoutLine: {'line': b'running egg_info\n'}
+[1.616363] (-) TimerEvent: {}
+[1.634431] (rover_comms) StdoutLine: {'line': b'writing rover_comms.egg-info/PKG-INFO\n'}
+[1.635730] (rover_comms) StdoutLine: {'line': b'writing dependency_links to rover_comms.egg-info/dependency_links.txt\n'}
+[1.639374] (rover_comms) StdoutLine: {'line': b'writing top-level names to rover_comms.egg-info/top_level.txt\n'}
+[1.716553] (-) TimerEvent: {}
+[1.817367] (-) TimerEvent: {}
+[1.871161] (rover_comms) StdoutLine: {'line': b"reading manifest file 'rover_comms.egg-info/SOURCES.txt'\n"}
+[1.874466] (rover_comms) StdoutLine: {'line': b"writing manifest file 'rover_comms.egg-info/SOURCES.txt'\n"}
+[1.917649] (-) TimerEvent: {}
+[2.018658] (-) TimerEvent: {}
+[2.119672] (-) TimerEvent: {}
+[2.127886] (rover_comms) StdoutLine: {'line': b'[100%] Built target ament_cmake_python_build_rover_comms_egg\n'}
+[2.181619] (rover_comms) CommandEnded: {'returncode': 0}
+[2.184449] (rover_comms) JobProgress: {'identifier': 'rover_comms', 'progress': 'install'}
+[2.219898] (-) TimerEvent: {}
+[2.225882] (rover_comms) Command: {'cmd': ['/usr/bin/cmake', '--install', '/home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_comms'], 'cwd': '/home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_comms', 'env': OrderedDict({'LESSOPEN': '| /usr/bin/lesspipe %s', 'LANGUAGE': 'en_US.UTF-8', 'USER': 'rover3', 'SSH_CLIENT': '10.86.242.255 53864 22', 'XDG_SESSION_TYPE': 'tty', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/opt/ros/jazzy/lib/aarch64-linux-gnu:/opt/ros/jazzy/lib', 'HOME': '/home/rover3', 'OLDPWD': '/home/rover3/TwoMonthRover_Team3/ros2_ws/src', 'SSH_TTY': '/dev/pts/2', 'ROS_PYTHON_VERSION': '3', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'COLCON_PREFIX_PATH': '/home/rover3/TwoMonthRover_Team3/ros2_ws/install', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'rover3', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'XDG_SESSION_CLASS': 'user', 'TERM': 'foot', 'XDG_SESSION_ID': '11', 'PATH': '/opt/ros/jazzy/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin', 'XDG_RUNTIME_DIR': '/run/user/1000', 'LANG': 'en_US.UTF-8', 'LS_COLORS': '', 'AMENT_PREFIX_PATH': '/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg:/opt/ros/jazzy', 'LC_MESSAGES': 'en_US.UTF-8', 'SHELL': '/bin/bash', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'PWD': '/home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_comms', 'SSH_CONNECTION': '10.86.242.255 53864 10.86.39.76 22', 'PYTHONPATH': '/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/python3.12/site-packages:/opt/ros/jazzy/lib/python3.12/site-packages', 'COLCON': '1', 'CMAKE_PREFIX_PATH': '/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg:/opt/ros/jazzy'}), 'shell': False}
+[2.265663] (rover_comms) StdoutLine: {'line': b'-- Install configuration: ""\n'}
+[2.266793] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/ament_index/resource_index/rosidl_interfaces/rover_comms\n'}
+[2.267486] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/msg/ArmControl.json\n'}
+[2.268214] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms\n'}
+[2.268928] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg\n'}
+[2.269489] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail\n'}
+[2.270043] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__struct.h\n'}
+[2.270687] (rover_comms) StdoutLine: {'line': b'-- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__type_support.c\n'}
+[2.271393] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__description.c\n'}
+[2.271941] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__type_support.h\n'}
+[2.272483] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__functions.h\n'}
+[2.273135] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__functions.c\n'}
+[2.273792] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/rosidl_generator_c__visibility_control.h\n'}
+[2.274574] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/arm_control.h\n'}
+[2.275198] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/environment/library_path.sh\n'}
+[2.275703] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/environment/library_path.dsv\n'}
+[2.276300] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_generator_c.so\n'}
+[2.277046] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms\n'}
+[2.277591] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg\n'}
+[2.278223] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/rosidl_typesupport_fastrtps_c__visibility_control.h\n'}
+[2.278733] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail\n'}
+[2.279310] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__rosidl_typesupport_fastrtps_c.h\n'}
+[2.279928] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_typesupport_fastrtps_c.so\n'}
+[2.280553] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms\n'}
+[2.281234] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg\n'}
+[2.281735] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/rosidl_generator_cpp__visibility_control.hpp\n'}
+[2.282242] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail\n'}
+[2.282821] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__struct.hpp\n'}
+[2.283419] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__type_support.hpp\n'}
+[2.283997] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__traits.hpp\n'}
+[2.284685] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__builder.hpp\n'}
+[2.285290] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/arm_control.hpp\n'}
+[2.285882] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms\n'}
+[2.286464] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg\n'}
+[2.287068] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h\n'}
+[2.287781] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail\n'}
+[2.288626] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/dds_fastrtps\n'}
+[2.289150] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__rosidl_typesupport_fastrtps_cpp.hpp\n'}
+[2.289641] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_typesupport_fastrtps_cpp.so\n'}
+[2.290123] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms\n'}
+[2.290604] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg\n'}
+[2.291082] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail\n'}
+[2.291561] (rover_comms) StdoutLine: {'line': b'-- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__type_support.c\n'}
+[2.292092] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__rosidl_typesupport_introspection_c.h\n'}
+[2.292695] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/rosidl_typesupport_introspection_c__visibility_control.h\n'}
+[2.293196] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_typesupport_introspection_c.so\n'}
+[2.293683] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_typesupport_c.so\n'}
+[2.294167] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms\n'}
+[2.294652] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg\n'}
+[2.295139] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail\n'}
+[2.295676] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__rosidl_typesupport_introspection_cpp.hpp\n'}
+[2.296161] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__type_support.cpp\n'}
+[2.296801] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_typesupport_introspection_cpp.so\n'}
+[2.297375] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_typesupport_cpp.so\n'}
+[2.297865] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/environment/pythonpath.sh\n'}
+[2.298346] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/environment/pythonpath.dsv\n'}
+[2.298825] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms-0.0.0-py3.12.egg-info\n'}
+[2.299308] (rover_comms) StdoutLine: {'line': b'-- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms-0.0.0-py3.12.egg-info/dependency_links.txt\n'}
+[2.299788] (rover_comms) StdoutLine: {'line': b'-- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms-0.0.0-py3.12.egg-info/SOURCES.txt\n'}
+[2.300335] (rover_comms) StdoutLine: {'line': b'-- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms-0.0.0-py3.12.egg-info/PKG-INFO\n'}
+[2.300895] (rover_comms) StdoutLine: {'line': b'-- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms-0.0.0-py3.12.egg-info/top_level.txt\n'}
+[2.301375] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms\n'}
+[2.301855] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/__init__.py\n'}
+[2.302334] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/msg\n'}
+[2.302813] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/msg/__init__.py\n'}
+[2.303294] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/msg/_arm_control.py\n'}
+[2.303770] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/msg/_arm_control_s.c\n'}
+[2.304247] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/_rover_comms_s.ep.rosidl_typesupport_fastrtps_c.c\n'}
+[2.304842] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/rover_comms_s__rosidl_typesupport_c.so\n'}
+[2.305320] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/_rover_comms_s.ep.rosidl_typesupport_c.c\n'}
+[2.305806] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/rover_comms_s__rosidl_typesupport_fastrtps_c.so\n'}
+[2.306365] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/_rover_comms_s.ep.rosidl_typesupport_introspection_c.c\n'}
+[2.306868] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/rover_comms_s__rosidl_typesupport_introspection_c.so\n'}
+[2.320076] (-) TimerEvent: {}
+[2.420989] (-) TimerEvent: {}
+[2.481093] (rover_comms) StdoutLine: {'line': b"Listing '/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms'...\n"}
+[2.482030] (rover_comms) StdoutLine: {'line': b"Listing '/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/msg'...\n"}
+[2.521317] (-) TimerEvent: {}
+[2.538820] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/rover_comms_s__rosidl_typesupport_fastrtps_c.so\n'}
+[2.539903] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/rover_comms_s__rosidl_typesupport_introspection_c.so\n'}
+[2.541148] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/rover_comms_s__rosidl_typesupport_c.so\n'}
+[2.542360] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_generator_py.so\n'}
+[2.543061] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/rust\n'}
+[2.543773] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/rust/Cargo.toml\n'}
+[2.544452] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/rust/build.rs\n'}
+[2.545189] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/rust/src\n'}
+[2.545875] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/rust/src/msg\n'}
+[2.546542] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/rust/src/msg/rmw.rs\n'}
+[2.547175] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/rust/src/msg.rs\n'}
+[2.547700] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/rust/src/lib.rs\n'}
+[2.548351] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/msg/ArmControl.idl\n'}
+[2.549005] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/msg/ArmControl.msg\n'}
+[2.549648] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/ament_index/resource_index/package_run_dependencies/rover_comms\n'}
+[2.550246] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/ament_index/resource_index/parent_prefix_path/rover_comms\n'}
+[2.550837] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/environment/ament_prefix_path.sh\n'}
+[2.551483] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/environment/ament_prefix_path.dsv\n'}
+[2.552112] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/environment/path.sh\n'}
+[2.552834] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/environment/path.dsv\n'}
+[2.553445] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/local_setup.bash\n'}
+[2.554076] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/local_setup.sh\n'}
+[2.554735] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/local_setup.zsh\n'}
+[2.555402] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/local_setup.dsv\n'}
+[2.556067] (rover_comms) StdoutLine: {'line': b'-- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/package.dsv\n'}
+[2.556859] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/ament_index/resource_index/packages/rover_comms\n'}
+[2.557479] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/export_rover_comms__rosidl_generator_cExport.cmake\n'}
+[2.557972] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/export_rover_comms__rosidl_generator_cExport-noconfig.cmake\n'}
+[2.558466] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/export_rover_comms__rosidl_typesupport_fastrtps_cExport.cmake\n'}
+[2.558958] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/export_rover_comms__rosidl_typesupport_fastrtps_cExport-noconfig.cmake\n'}
+[2.559446] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/export_rover_comms__rosidl_generator_cppExport.cmake\n'}
+[2.559931] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/export_rover_comms__rosidl_typesupport_fastrtps_cppExport.cmake\n'}
+[2.560503] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/export_rover_comms__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake\n'}
+[2.561011] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rover_comms__rosidl_typesupport_introspection_cExport.cmake\n'}
+[2.561590] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rover_comms__rosidl_typesupport_introspection_cExport-noconfig.cmake\n'}
+[2.562067] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rover_comms__rosidl_typesupport_cExport.cmake\n'}
+[2.562543] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rover_comms__rosidl_typesupport_cExport-noconfig.cmake\n'}
+[2.563018] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rover_comms__rosidl_typesupport_introspection_cppExport.cmake\n'}
+[2.563564] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rover_comms__rosidl_typesupport_introspection_cppExport-noconfig.cmake\n'}
+[2.564064] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rover_comms__rosidl_typesupport_cppExport.cmake\n'}
+[2.564769] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rover_comms__rosidl_typesupport_cppExport-noconfig.cmake\n'}
+[2.565270] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/export_rover_comms__rosidl_generator_pyExport.cmake\n'}
+[2.565761] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/export_rover_comms__rosidl_generator_pyExport-noconfig.cmake\n'}
+[2.566257] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rosidl_cmake-extras.cmake\n'}
+[2.566749] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/ament_cmake_export_dependencies-extras.cmake\n'}
+[2.567241] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/ament_cmake_export_include_directories-extras.cmake\n'}
+[2.567730] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/ament_cmake_export_libraries-extras.cmake\n'}
+[2.568225] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/ament_cmake_export_targets-extras.cmake\n'}
+[2.568935] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake\n'}
+[2.569484] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake\n'}
+[2.569975] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rosidl_cmake_aggregate_target-extras.cmake\n'}
+[2.570816] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rover_commsConfig.cmake\n'}
+[2.571308] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rover_commsConfig-version.cmake\n'}
+[2.571799] (rover_comms) StdoutLine: {'line': b'-- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/package.xml\n'}
+[2.573734] (rover_comms) CommandEnded: {'returncode': 0}
+[2.625198] (-) TimerEvent: {}
+[2.723413] (rover_comms) JobEnded: {'identifier': 'rover_comms', 'rc': 0}
+[2.729420] (-) TimerEvent: {}
+[2.730718] (rover_pkg) JobStarted: {'identifier': 'rover_pkg'}
+[2.829680] (-) TimerEvent: {}
+[2.930579] (-) TimerEvent: {}
+[3.031432] (-) TimerEvent: {}
+[3.132317] (-) TimerEvent: {}
+[3.233149] (-) TimerEvent: {}
+[3.334007] (-) TimerEvent: {}
+[3.434820] (-) TimerEvent: {}
+[3.535621] (-) TimerEvent: {}
+[3.636438] (-) TimerEvent: {}
+[3.737271] (-) TimerEvent: {}
+[3.838154] (-) TimerEvent: {}
+[3.939167] (-) TimerEvent: {}
+[4.040160] (-) TimerEvent: {}
+[4.141105] (-) TimerEvent: {}
+[4.241963] (-) TimerEvent: {}
+[4.342808] (-) TimerEvent: {}
+[4.443664] (-) TimerEvent: {}
+[4.544528] (-) TimerEvent: {}
+[4.645367] (-) TimerEvent: {}
+[4.746183] (-) TimerEvent: {}
+[4.846980] (-) TimerEvent: {}
+[4.947821] (-) TimerEvent: {}
+[5.048701] (-) TimerEvent: {}
+[5.149561] (-) TimerEvent: {}
+[5.250410] (-) TimerEvent: {}
+[5.351237] (-) TimerEvent: {}
+[5.452108] (-) TimerEvent: {}
+[5.553016] (-) TimerEvent: {}
+[5.653831] (-) TimerEvent: {}
+[5.754636] (-) TimerEvent: {}
+[5.855597] (-) TimerEvent: {}
+[5.956437] (-) TimerEvent: {}
+[6.057225] (-) TimerEvent: {}
+[6.158074] (-) TimerEvent: {}
+[6.258893] (-) TimerEvent: {}
+[6.359830] (-) TimerEvent: {}
+[6.460884] (-) TimerEvent: {}
+[6.561898] (-) TimerEvent: {}
+[6.662922] (-) TimerEvent: {}
+[6.669257] (rover_pkg) Command: {'cmd': ['/usr/bin/python3', '-W', 'ignore:setup.py install is deprecated', '-W', 'ignore:easy_install command is deprecated', 'setup.py', 'egg_info', '--egg-base', '../../build/rover_pkg', 'build', '--build-base', '/home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/build', 'install', '--record', '/home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/install.log', '--install-scripts', '$base/lib/rover_pkg', '--single-version-externally-managed', 'install_data'], 'cwd': '/home/rover3/TwoMonthRover_Team3/ros2_ws/src/rover_pkg', 'env': OrderedDict({'LESSOPEN': '| /usr/bin/lesspipe %s', 'LANGUAGE': 'en_US.UTF-8', 'USER': 'rover3', 'SSH_CLIENT': '10.86.242.255 53864 22', 'XDG_SESSION_TYPE': 'tty', 'SHLVL': '1', 'LD_LIBRARY_PATH': '/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib:/opt/ros/jazzy/lib/aarch64-linux-gnu:/opt/ros/jazzy/lib', 'HOME': '/home/rover3', 'OLDPWD': '/home/rover3/TwoMonthRover_Team3/ros2_ws/src', 'SSH_TTY': '/dev/pts/2', 'ROS_PYTHON_VERSION': '3', 'DBUS_SESSION_BUS_ADDRESS': 'unix:path=/run/user/1000/bus', 'COLCON_PREFIX_PATH': '/home/rover3/TwoMonthRover_Team3/ros2_ws/install', 'ROS_DISTRO': 'jazzy', 'LOGNAME': 'rover3', '_': '/usr/bin/colcon', 'ROS_VERSION': '2', 'XDG_SESSION_CLASS': 'user', 'TERM': 'foot', 'XDG_SESSION_ID': '11', 'PATH': '/opt/ros/jazzy/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin', 'XDG_RUNTIME_DIR': '/run/user/1000', 'LANG': 'en_US.UTF-8', 'LS_COLORS': '', 'AMENT_PREFIX_PATH': '/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms:/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg:/opt/ros/jazzy', 'LC_MESSAGES': 'en_US.UTF-8', 'SHELL': '/bin/bash', 'LESSCLOSE': '/usr/bin/lesspipe %s %s', 'ROS_AUTOMATIC_DISCOVERY_RANGE': 'SUBNET', 'PWD': '/home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg', 'SSH_CONNECTION': '10.86.242.255 53864 10.86.39.76 22', 'PYTHONPATH': '/home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/python3.12/site-packages:/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages:/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/python3.12/site-packages:/opt/ros/jazzy/lib/python3.12/site-packages', 'COLCON': '1', 'CMAKE_PREFIX_PATH': '/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms'}), 'shell': False}
+[6.763110] (-) TimerEvent: {}
+[6.863940] (-) TimerEvent: {}
+[6.964835] (-) TimerEvent: {}
+[7.065659] (-) TimerEvent: {}
+[7.166468] (-) TimerEvent: {}
+[7.267298] (-) TimerEvent: {}
+[7.368105] (-) TimerEvent: {}
+[7.468968] (-) TimerEvent: {}
+[7.569771] (-) TimerEvent: {}
+[7.670584] (-) TimerEvent: {}
+[7.771392] (-) TimerEvent: {}
+[7.872208] (-) TimerEvent: {}
+[7.940525] (rover_pkg) StdoutLine: {'line': b'running egg_info\n'}
+[7.972386] (-) TimerEvent: {}
+[8.017096] (rover_pkg) StdoutLine: {'line': b'writing ../../build/rover_pkg/rover_pkg.egg-info/PKG-INFO\n'}
+[8.018463] (rover_pkg) StdoutLine: {'line': b'writing dependency_links to ../../build/rover_pkg/rover_pkg.egg-info/dependency_links.txt\n'}
+[8.021591] (rover_pkg) StdoutLine: {'line': b'writing entry points to ../../build/rover_pkg/rover_pkg.egg-info/entry_points.txt\n'}
+[8.022409] (rover_pkg) StdoutLine: {'line': b'writing requirements to ../../build/rover_pkg/rover_pkg.egg-info/requires.txt\n'}
+[8.023620] (rover_pkg) StdoutLine: {'line': b'writing top-level names to ../../build/rover_pkg/rover_pkg.egg-info/top_level.txt\n'}
+[8.072557] (-) TimerEvent: {}
+[8.173333] (-) TimerEvent: {}
+[8.181193] (rover_pkg) StdoutLine: {'line': b"reading manifest file '../../build/rover_pkg/rover_pkg.egg-info/SOURCES.txt'\n"}
+[8.182782] (rover_pkg) StdoutLine: {'line': b"adding license file 'LICENSE'\n"}
+[8.186437] (rover_pkg) StdoutLine: {'line': b"writing manifest file '../../build/rover_pkg/rover_pkg.egg-info/SOURCES.txt'\n"}
+[8.187221] (rover_pkg) StdoutLine: {'line': b'running build\n'}
+[8.187831] (rover_pkg) StdoutLine: {'line': b'running build_py\n'}
+[8.188867] (rover_pkg) StdoutLine: {'line': b'copying rover_pkg/rover_onboard_node.py -> /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/build/lib/rover_pkg\n'}
+[8.190622] (rover_pkg) StdoutLine: {'line': b'running install\n'}
+[8.240718] (rover_pkg) StdoutLine: {'line': b'running install_lib\n'}
+[8.273490] (-) TimerEvent: {}
+[8.318938] (rover_pkg) StdoutLine: {'line': b'copying /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/build/lib/rover_pkg/rover_onboard_node.py -> /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/python3.12/site-packages/rover_pkg\n'}
+[8.322476] (rover_pkg) StdoutLine: {'line': b'byte-compiling /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/python3.12/site-packages/rover_pkg/rover_onboard_node.py to rover_onboard_node.cpython-312.pyc\n'}
+[8.332529] (rover_pkg) StdoutLine: {'line': b'running install_data\n'}
+[8.333409] (rover_pkg) StdoutLine: {'line': b'running install_egg_info\n'}
+[8.373658] (-) TimerEvent: {}
+[8.418206] (rover_pkg) StdoutLine: {'line': b"removing '/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/python3.12/site-packages/rover_pkg-0.0.0-py3.12.egg-info' (and everything under it)\n"}
+[8.419721] (rover_pkg) StdoutLine: {'line': b'Copying ../../build/rover_pkg/rover_pkg.egg-info to /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/python3.12/site-packages/rover_pkg-0.0.0-py3.12.egg-info\n'}
+[8.424398] (rover_pkg) StdoutLine: {'line': b'running install_scripts\n'}
+[8.473840] (-) TimerEvent: {}
+[8.574662] (-) TimerEvent: {}
+[8.675490] (-) TimerEvent: {}
+[8.776386] (-) TimerEvent: {}
+[8.877335] (-) TimerEvent: {}
+[8.960852] (rover_pkg) StdoutLine: {'line': b'Installing orangepi_node script to /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/rover_pkg\n'}
+[8.962839] (rover_pkg) StdoutLine: {'line': b"writing list of installed files to '/home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/install.log'\n"}
+[8.977589] (-) TimerEvent: {}
+[9.078616] (-) TimerEvent: {}
+[9.179659] (-) TimerEvent: {}
+[9.269078] (rover_pkg) CommandEnded: {'returncode': 0}
+[9.280456] (-) TimerEvent: {}
+[9.305905] (rover_pkg) JobEnded: {'identifier': 'rover_pkg', 'rc': 0}
+[9.309316] (-) EventReactorShutdown: {}

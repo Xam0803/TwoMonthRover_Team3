@@ -1,0 +1,226 @@
+[0.054s] Invoking command in '/home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_comms': CMAKE_PREFIX_PATH=/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg:/opt/ros/jazzy /usr/bin/cmake --build /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_comms -- -j4 -l4
+[0.181s] -- Found ament_cmake: 2.5.6 (/opt/ros/jazzy/share/ament_cmake/cmake)
+[0.805s] -- Found geometry_msgs: 5.3.8 (/opt/ros/jazzy/share/geometry_msgs/cmake)
+[0.928s] -- Found rosidl_generator_c: 4.6.9 (/opt/ros/jazzy/share/rosidl_generator_c/cmake)
+[0.992s] -- Found rosidl_generator_cpp: 4.6.9 (/opt/ros/jazzy/share/rosidl_generator_cpp/cmake)
+[1.069s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[1.160s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[1.417s] -- Found rosidl_default_generators: 1.6.1 (/opt/ros/jazzy/share/rosidl_default_generators/cmake)
+[1.488s] -- Found rosidl_adapter: 4.6.9 (/opt/ros/jazzy/share/rosidl_adapter/cmake)
+[3.259s] -- Found ament_cmake_ros: 0.12.1 (/opt/ros/jazzy/share/ament_cmake_ros/cmake)
+[5.044s] -- Using all available rosidl_typesupport_c: rosidl_typesupport_fastrtps_c;rosidl_typesupport_introspection_c
+[5.750s] -- Using all available rosidl_typesupport_cpp: rosidl_typesupport_fastrtps_cpp;rosidl_typesupport_introspection_cpp
+[5.756s] -- Found python_cmake_module: 0.11.1 (/opt/ros/jazzy/share/python_cmake_module/cmake)
+[7.448s] -- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter Development NumPy Development.Module Development.Embed 
+[8.070s] -- Found Python3: /usr/bin/python3 (found version "3.12.3") found components: Interpreter 
+[8.078s] -- Found ament_lint_auto: 0.17.5 (/opt/ros/jazzy/share/ament_lint_auto/cmake)
+[8.125s] -- Added test 'lint_cmake' to check CMake code style
+[8.130s] -- Added test 'xmllint' to check XML markup files
+[8.142s] -- Configuring done (8.0s)
+[8.381s] -- Generating done (0.2s)
+[8.485s] -- Build files have been written to: /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_comms
+[8.653s] [  2%] [34m[1mGenerating type hashes for ROS interfaces[0m
+[8.659s] [  5%] [34m[1mGenerating Rust code for ROS interfaces[0m
+[8.700s] [  5%] Built target ament_cmake_python_copy_rover_comms
+[9.908s] running egg_info
+[9.993s] writing rover_comms.egg-info/PKG-INFO
+[9.994s] writing dependency_links to rover_comms.egg-info/dependency_links.txt
+[9.998s] writing top-level names to rover_comms.egg-info/top_level.txt
+[10.276s] reading manifest file 'rover_comms.egg-info/SOURCES.txt'
+[10.279s] [  5%] Built target rover_comms__rosidl_generator_type_description
+[10.282s] writing manifest file 'rover_comms.egg-info/SOURCES.txt'
+[10.335s] [  8%] [34m[1mGenerating C code for ROS interfaces[0m
+[10.392s] [ 11%] [34m[1mGenerating C++ code for ROS interfaces[0m
+[10.550s] [ 11%] Built target rover_comms__rs
+[10.635s] [ 11%] Built target ament_cmake_python_build_rover_comms_egg
+[12.268s] [ 11%] Built target rover_comms__cpp
+[12.468s] [ 20%] [32mBuilding C object CMakeFiles/rover_comms__rosidl_generator_c.dir/rosidl_generator_c/rover_comms/msg/detail/arm_control__functions.c.o[0m
+[12.469s] [ 20%] [32mBuilding C object CMakeFiles/rover_comms__rosidl_generator_c.dir/rosidl_generator_c/rover_comms/msg/detail/arm_control__description.c.o[0m
+[12.470s] [ 20%] [32mBuilding C object CMakeFiles/rover_comms__rosidl_generator_c.dir/rosidl_generator_c/rover_comms/msg/detail/arm_control__type_support.c.o[0m
+[12.951s] [ 22%] [32m[1mLinking C shared library librover_comms__rosidl_generator_c.so[0m
+[13.192s] [ 22%] Built target rover_comms__rosidl_generator_c
+[13.243s] [ 34%] [34m[1mGenerating C type support dispatch for ROS interfaces[0m
+[13.244s] [ 34%] [34m[1mGenerating C++ type support for eProsima Fast-RTPS[0m
+[13.245s] [ 34%] [34m[1mGenerating C introspection for ROS interfaces[0m
+[13.251s] [ 34%] [34m[1mGenerating C type support for eProsima Fast-RTPS[0m
+[15.102s] [ 37%] [32mBuilding CXX object CMakeFiles/rover_comms__rosidl_typesupport_c.dir/rosidl_typesupport_c/rover_comms/msg/arm_control__type_support.cpp.o[0m
+[15.238s] [ 40%] [32mBuilding C object CMakeFiles/rover_comms__rosidl_typesupport_introspection_c.dir/rosidl_typesupport_introspection_c/rover_comms/msg/detail/arm_control__type_support.c.o[0m
+[15.371s] [ 42%] [32mBuilding CXX object CMakeFiles/rover_comms__rosidl_typesupport_fastrtps_cpp.dir/rosidl_typesupport_fastrtps_cpp/rover_comms/msg/detail/dds_fastrtps/arm_control__type_support.cpp.o[0m
+[15.411s] [ 45%] [32mBuilding CXX object CMakeFiles/rover_comms__rosidl_typesupport_fastrtps_c.dir/rosidl_typesupport_fastrtps_c/rover_comms/msg/detail/arm_control__type_support_c.cpp.o[0m
+[15.421s] [ 48%] [32m[1mLinking CXX shared library librover_comms__rosidl_typesupport_c.so[0m
+[15.507s] [ 51%] [32m[1mLinking C shared library librover_comms__rosidl_typesupport_introspection_c.so[0m
+[15.672s] [ 51%] Built target rover_comms__rosidl_typesupport_c
+[15.693s] [ 51%] Built target rover_comms__rosidl_typesupport_introspection_c
+[15.725s] [ 54%] [34m[1mGenerating C++ introspection for ROS interfaces[0m
+[15.761s] [ 57%] [34m[1mGenerating C++ type support dispatch for ROS interfaces[0m
+[17.767s] [ 60%] [32mBuilding CXX object CMakeFiles/rover_comms__rosidl_typesupport_cpp.dir/rosidl_typesupport_cpp/rover_comms/msg/arm_control__type_support.cpp.o[0m
+[17.816s] [ 62%] [32mBuilding CXX object CMakeFiles/rover_comms__rosidl_typesupport_introspection_cpp.dir/rosidl_typesupport_introspection_cpp/rover_comms/msg/detail/arm_control__type_support.cpp.o[0m
+[19.047s] [ 65%] [32m[1mLinking CXX shared library librover_comms__rosidl_typesupport_fastrtps_c.so[0m
+[19.127s] [ 68%] [32m[1mLinking CXX shared library librover_comms__rosidl_typesupport_fastrtps_cpp.so[0m
+[19.474s] [ 68%] Built target rover_comms__rosidl_typesupport_fastrtps_c
+[19.562s] [ 68%] Built target rover_comms__rosidl_typesupport_fastrtps_cpp
+[20.119s] [ 71%] [32m[1mLinking CXX shared library librover_comms__rosidl_typesupport_cpp.so[0m
+[20.165s] [ 74%] [32m[1mLinking CXX shared library librover_comms__rosidl_typesupport_introspection_cpp.so[0m
+[20.346s] [ 74%] Built target rover_comms__rosidl_typesupport_cpp
+[20.729s] [ 74%] Built target rover_comms__rosidl_typesupport_introspection_cpp
+[20.815s] [ 74%] Built target rover_comms
+[20.906s] [ 77%] [34m[1mGenerating Python code for ROS interfaces[0m
+[22.919s] [ 77%] Built target rover_comms__py
+[23.006s] [ 80%] [32mBuilding C object CMakeFiles/rover_comms__rosidl_generator_py.dir/rosidl_generator_py/rover_comms/msg/_arm_control_s.c.o[0m
+[23.940s] [ 82%] [32m[1mLinking C shared library librover_comms__rosidl_generator_py.so[0m
+[24.218s] [ 82%] Built target rover_comms__rosidl_generator_py
+[24.312s] [ 91%] [32mBuilding C object CMakeFiles/rover_comms_s__rosidl_typesupport_introspection_c.dir/rosidl_generator_py/rover_comms/_rover_comms_s.ep.rosidl_typesupport_introspection_c.c.o[0m
+[24.313s] [ 91%] [32mBuilding C object CMakeFiles/rover_comms_s__rosidl_typesupport_c.dir/rosidl_generator_py/rover_comms/_rover_comms_s.ep.rosidl_typesupport_c.c.o[0m
+[24.314s] [ 91%] [32mBuilding C object CMakeFiles/rover_comms_s__rosidl_typesupport_fastrtps_c.dir/rosidl_generator_py/rover_comms/_rover_comms_s.ep.rosidl_typesupport_fastrtps_c.c.o[0m
+[24.983s] [ 94%] [32m[1mLinking C shared module rosidl_generator_py/rover_comms/rover_comms_s__rosidl_typesupport_c.so[0m
+[24.984s] [ 97%] [32m[1mLinking C shared module rosidl_generator_py/rover_comms/rover_comms_s__rosidl_typesupport_introspection_c.so[0m
+[25.007s] [100%] [32m[1mLinking C shared module rosidl_generator_py/rover_comms/rover_comms_s__rosidl_typesupport_fastrtps_c.so[0m
+[25.146s] [100%] Built target rover_comms_s__rosidl_typesupport_c
+[25.151s] [100%] Built target rover_comms_s__rosidl_typesupport_introspection_c
+[25.188s] [100%] Built target rover_comms_s__rosidl_typesupport_fastrtps_c
+[25.243s] Invoked command in '/home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_comms' returned '0': CMAKE_PREFIX_PATH=/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg:/opt/ros/jazzy /usr/bin/cmake --build /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_comms -- -j4 -l4
+[25.293s] Invoking command in '/home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_comms': CMAKE_PREFIX_PATH=/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg:/opt/ros/jazzy /usr/bin/cmake --install /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_comms
+[25.331s] -- Install configuration: ""
+[25.332s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/ament_index/resource_index/rosidl_interfaces/rover_comms
+[25.333s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/msg/ArmControl.json
+[25.334s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms
+[25.334s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg
+[25.335s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail
+[25.336s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__struct.h
+[25.337s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__type_support.c
+[25.338s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__description.c
+[25.339s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__type_support.h
+[25.340s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__functions.h
+[25.340s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__functions.c
+[25.341s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/rosidl_generator_c__visibility_control.h
+[25.341s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/arm_control.h
+[25.342s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/environment/library_path.sh
+[25.343s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/environment/library_path.dsv
+[25.343s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_generator_c.so
+[25.344s] -- Set non-toolchain portion of runtime path of "/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_generator_c.so" to ""
+[25.344s] -- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms
+[25.345s] -- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg
+[25.346s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/rosidl_typesupport_fastrtps_c__visibility_control.h
+[25.346s] -- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail
+[25.347s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__rosidl_typesupport_fastrtps_c.h
+[25.347s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_typesupport_fastrtps_c.so
+[25.348s] -- Set non-toolchain portion of runtime path of "/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_typesupport_fastrtps_c.so" to ""
+[25.349s] -- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms
+[25.349s] -- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg
+[25.350s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/rosidl_generator_cpp__visibility_control.hpp
+[25.351s] -- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail
+[25.351s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__struct.hpp
+[25.352s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__type_support.hpp
+[25.352s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__traits.hpp
+[25.353s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__builder.hpp
+[25.354s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/arm_control.hpp
+[25.354s] -- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms
+[25.355s] -- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg
+[25.355s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/rosidl_typesupport_fastrtps_cpp__visibility_control.h
+[25.356s] -- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail
+[25.357s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/dds_fastrtps
+[25.357s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__rosidl_typesupport_fastrtps_cpp.hpp
+[25.358s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_typesupport_fastrtps_cpp.so
+[25.358s] -- Set non-toolchain portion of runtime path of "/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_typesupport_fastrtps_cpp.so" to ""
+[25.359s] -- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms
+[25.360s] -- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg
+[25.360s] -- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail
+[25.361s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__type_support.c
+[25.361s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__rosidl_typesupport_introspection_c.h
+[25.362s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/rosidl_typesupport_introspection_c__visibility_control.h
+[25.363s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_typesupport_introspection_c.so
+[25.363s] -- Set non-toolchain portion of runtime path of "/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_typesupport_introspection_c.so" to ""
+[25.364s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_typesupport_c.so
+[25.364s] -- Set non-toolchain portion of runtime path of "/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_typesupport_c.so" to ""
+[25.365s] -- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms
+[25.365s] -- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg
+[25.366s] -- Up-to-date: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail
+[25.367s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__rosidl_typesupport_introspection_cpp.hpp
+[25.367s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/include/rover_comms/rover_comms/msg/detail/arm_control__type_support.cpp
+[25.368s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_typesupport_introspection_cpp.so
+[25.368s] -- Set non-toolchain portion of runtime path of "/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_typesupport_introspection_cpp.so" to ""
+[25.369s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_typesupport_cpp.so
+[25.370s] -- Set non-toolchain portion of runtime path of "/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_typesupport_cpp.so" to ""
+[25.370s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/environment/pythonpath.sh
+[25.371s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/environment/pythonpath.dsv
+[25.371s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms-0.0.0-py3.12.egg-info
+[25.372s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms-0.0.0-py3.12.egg-info/dependency_links.txt
+[25.373s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms-0.0.0-py3.12.egg-info/SOURCES.txt
+[25.373s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms-0.0.0-py3.12.egg-info/PKG-INFO
+[25.374s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms-0.0.0-py3.12.egg-info/top_level.txt
+[25.375s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms
+[25.375s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/__init__.py
+[25.376s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/msg
+[25.377s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/msg/__init__.py
+[25.377s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/msg/_arm_control.py
+[25.378s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/msg/_arm_control_s.c
+[25.378s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/_rover_comms_s.ep.rosidl_typesupport_fastrtps_c.c
+[25.379s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/rover_comms_s__rosidl_typesupport_c.so
+[25.379s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/_rover_comms_s.ep.rosidl_typesupport_c.c
+[25.380s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/rover_comms_s__rosidl_typesupport_fastrtps_c.so
+[25.380s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/_rover_comms_s.ep.rosidl_typesupport_introspection_c.c
+[25.381s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/rover_comms_s__rosidl_typesupport_introspection_c.so
+[25.601s] Listing '/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms'...
+[25.602s] Compiling '/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/__init__.py'...
+[25.603s] Listing '/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/msg'...
+[25.603s] Compiling '/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/msg/__init__.py'...
+[25.604s] Compiling '/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/msg/_arm_control.py'...
+[25.662s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/rover_comms_s__rosidl_typesupport_fastrtps_c.so
+[25.664s] -- Set non-toolchain portion of runtime path of "/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/rover_comms_s__rosidl_typesupport_fastrtps_c.so" to ""
+[25.665s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/rover_comms_s__rosidl_typesupport_introspection_c.so
+[25.666s] -- Set non-toolchain portion of runtime path of "/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/rover_comms_s__rosidl_typesupport_introspection_c.so" to ""
+[25.667s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/rover_comms_s__rosidl_typesupport_c.so
+[25.669s] -- Set non-toolchain portion of runtime path of "/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages/rover_comms/rover_comms_s__rosidl_typesupport_c.so" to ""
+[25.670s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_generator_py.so
+[25.671s] -- Set non-toolchain portion of runtime path of "/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/librover_comms__rosidl_generator_py.so" to ""
+[25.672s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/rust
+[25.673s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/rust/Cargo.toml
+[25.673s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/rust/build.rs
+[25.674s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/rust/src
+[25.675s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/rust/src/msg
+[25.675s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/rust/src/msg/rmw.rs
+[25.676s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/rust/src/msg.rs
+[25.677s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/rust/src/lib.rs
+[25.677s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/msg/ArmControl.idl
+[25.678s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/msg/ArmControl.msg
+[25.678s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/ament_index/resource_index/package_run_dependencies/rover_comms
+[25.679s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/ament_index/resource_index/parent_prefix_path/rover_comms
+[25.680s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/environment/ament_prefix_path.sh
+[25.680s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/environment/ament_prefix_path.dsv
+[25.681s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/environment/path.sh
+[25.682s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/environment/path.dsv
+[25.682s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/local_setup.bash
+[25.683s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/local_setup.sh
+[25.683s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/local_setup.zsh
+[25.684s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/local_setup.dsv
+[25.685s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/package.dsv
+[25.685s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/ament_index/resource_index/packages/rover_comms
+[25.686s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/export_rover_comms__rosidl_generator_cExport.cmake
+[25.686s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/export_rover_comms__rosidl_generator_cExport-noconfig.cmake
+[25.687s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/export_rover_comms__rosidl_typesupport_fastrtps_cExport.cmake
+[25.688s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/export_rover_comms__rosidl_typesupport_fastrtps_cExport-noconfig.cmake
+[25.689s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/export_rover_comms__rosidl_generator_cppExport.cmake
+[25.689s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/export_rover_comms__rosidl_typesupport_fastrtps_cppExport.cmake
+[25.690s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/export_rover_comms__rosidl_typesupport_fastrtps_cppExport-noconfig.cmake
+[25.691s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rover_comms__rosidl_typesupport_introspection_cExport.cmake
+[25.692s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rover_comms__rosidl_typesupport_introspection_cExport-noconfig.cmake
+[25.692s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rover_comms__rosidl_typesupport_cExport.cmake
+[25.693s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rover_comms__rosidl_typesupport_cExport-noconfig.cmake
+[25.694s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rover_comms__rosidl_typesupport_introspection_cppExport.cmake
+[25.695s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rover_comms__rosidl_typesupport_introspection_cppExport-noconfig.cmake
+[25.695s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rover_comms__rosidl_typesupport_cppExport.cmake
+[25.696s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rover_comms__rosidl_typesupport_cppExport-noconfig.cmake
+[25.697s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/export_rover_comms__rosidl_generator_pyExport.cmake
+[25.697s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/export_rover_comms__rosidl_generator_pyExport-noconfig.cmake
+[25.698s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rosidl_cmake-extras.cmake
+[25.699s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/ament_cmake_export_dependencies-extras.cmake
+[25.699s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/ament_cmake_export_include_directories-extras.cmake
+[25.700s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/ament_cmake_export_libraries-extras.cmake
+[25.701s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/ament_cmake_export_targets-extras.cmake
+[25.702s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rosidl_cmake_export_typesupport_targets-extras.cmake
+[25.703s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rosidl_cmake_export_typesupport_libraries-extras.cmake
+[25.704s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rosidl_cmake_aggregate_target-extras.cmake
+[25.704s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rover_commsConfig.cmake
+[25.705s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/cmake/rover_commsConfig-version.cmake
+[25.705s] -- Installing: /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/share/rover_comms/package.xml
+[25.717s] Invoked command in '/home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_comms' returned '0': CMAKE_PREFIX_PATH=/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg:/opt/ros/jazzy /usr/bin/cmake --install /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_comms

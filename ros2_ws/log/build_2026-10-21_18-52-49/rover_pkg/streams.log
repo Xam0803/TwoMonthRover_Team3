@@ -1,0 +1,41 @@
+[4.246s] Invoking command in '/home/rover3/TwoMonthRover_Team3/ros2_ws/src/rover_pkg': PYTHONPATH=/home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/rover_pkg build --build-base /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/build install --record /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/install.log --install-scripts $base/lib/rover_pkg --single-version-externally-managed install_data
+[5.501s] running egg_info
+[5.502s] creating ../../build/rover_pkg/rover_pkg.egg-info
+[5.576s] writing ../../build/rover_pkg/rover_pkg.egg-info/PKG-INFO
+[5.577s] writing dependency_links to ../../build/rover_pkg/rover_pkg.egg-info/dependency_links.txt
+[5.578s] writing entry points to ../../build/rover_pkg/rover_pkg.egg-info/entry_points.txt
+[5.579s] writing requirements to ../../build/rover_pkg/rover_pkg.egg-info/requires.txt
+[5.580s] writing top-level names to ../../build/rover_pkg/rover_pkg.egg-info/top_level.txt
+[5.580s] writing manifest file '../../build/rover_pkg/rover_pkg.egg-info/SOURCES.txt'
+[5.733s] reading manifest file '../../build/rover_pkg/rover_pkg.egg-info/SOURCES.txt'
+[5.734s] adding license file 'LICENSE'
+[5.737s] writing manifest file '../../build/rover_pkg/rover_pkg.egg-info/SOURCES.txt'
+[5.738s] running build
+[5.738s] running build_py
+[5.739s] creating /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/build
+[5.740s] creating /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/build/lib
+[5.740s] creating /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/build/lib/rover_pkg
+[5.741s] copying rover_pkg/__init__.py -> /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/build/lib/rover_pkg
+[5.742s] copying rover_pkg/orangepi_node.py -> /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/build/lib/rover_pkg
+[5.743s] copying rover_pkg/rover_onboard_node.py -> /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/build/lib/rover_pkg
+[5.743s] running install
+[5.793s] running install_lib
+[5.870s] creating /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/python3.12/site-packages/rover_pkg
+[5.871s] copying /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/build/lib/rover_pkg/__init__.py -> /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/python3.12/site-packages/rover_pkg
+[5.871s] copying /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/build/lib/rover_pkg/orangepi_node.py -> /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/python3.12/site-packages/rover_pkg
+[5.872s] copying /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/build/lib/rover_pkg/rover_onboard_node.py -> /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/python3.12/site-packages/rover_pkg
+[5.875s] byte-compiling /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/python3.12/site-packages/rover_pkg/__init__.py to __init__.cpython-312.pyc
+[5.876s] byte-compiling /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/python3.12/site-packages/rover_pkg/orangepi_node.py to orangepi_node.cpython-312.pyc
+[5.878s] byte-compiling /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/python3.12/site-packages/rover_pkg/rover_onboard_node.py to rover_onboard_node.cpython-312.pyc
+[5.887s] running install_data
+[5.888s] creating /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/share/ament_index
+[5.889s] creating /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/share/ament_index/resource_index
+[5.889s] creating /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/share/ament_index/resource_index/packages
+[5.890s] copying resource/rover_pkg -> /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/share/ament_index/resource_index/packages
+[5.891s] copying package.xml -> /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/share/rover_pkg
+[5.891s] running install_egg_info
+[5.974s] Copying ../../build/rover_pkg/rover_pkg.egg-info to /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/python3.12/site-packages/rover_pkg-0.0.0-py3.12.egg-info
+[5.978s] running install_scripts
+[6.504s] Installing orangepi_node script to /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/rover_pkg
+[6.506s] writing list of installed files to '/home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/install.log'
+[6.807s] Invoked command in '/home/rover3/TwoMonthRover_Team3/ros2_ws/src/rover_pkg' returned '0': PYTHONPATH=/home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/rover_pkg build --build-base /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/build install --record /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/install.log --install-scripts $base/lib/rover_pkg --single-version-externally-managed install_data

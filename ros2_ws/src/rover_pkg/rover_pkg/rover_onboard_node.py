@@ -9,26 +9,22 @@ Orange Pi Onboard ROS 2 Node
 import sys
 import json
 import time
+import serial
 from datetime import datetime
 
-import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
+from rover_comms.msg import ArmControl, Telemetry
 
-try:
-    import serial
-    SERIAL_AVAILABLE = True
-except ImportError:
-    SERIAL_AVAILABLE = False
 
 
 class OrangePiRoverNode(Node):
     def __init__(self):
         super().__init__('orange_pi_rover_node')
 
-        self.telemetry_pub = self.create_publisher(String, '/rover/telemetry', 10)
+        self.telemetry_pub = self.create_publisher(Telemetry, '/rover/telemetry', 10)
         self.arm_sub = self.create_subscription(
-            String, '/rover/arm_commands', self.arm_command_callback, 10
+            ArmControl, '/rover/arm_commands', self.arm_command_callback, 10
         )
 
         self.ser = None
@@ -39,10 +35,6 @@ class OrangePiRoverNode(Node):
         self.timer = self.create_timer(0.05, self.read_serial_and_publish_telemetry)
 
     def init_serial(self):
-        if not SERIAL_AVAILABLE:
-            self.get_logger().error("pyserial library missing! Run: pip3 install pyserial")
-            return
-
         for port in self.port_candidates:
             try:
                 self.ser = serial.Serial(port, 115200, timeout=0.1)

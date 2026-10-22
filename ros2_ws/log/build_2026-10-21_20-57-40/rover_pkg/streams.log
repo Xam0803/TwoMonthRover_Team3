@@ -1,0 +1,23 @@
+[3.950s] Invoking command in '/home/rover3/TwoMonthRover_Team3/ros2_ws/src/rover_pkg': AMENT_PREFIX_PATH=/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms LD_LIBRARY_PATH=/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/python3.12/site-packages:/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/rover_pkg build --build-base /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/build install --record /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/install.log --install-scripts $base/lib/rover_pkg --single-version-externally-managed install_data
+[5.211s] running egg_info
+[5.287s] writing ../../build/rover_pkg/rover_pkg.egg-info/PKG-INFO
+[5.288s] writing dependency_links to ../../build/rover_pkg/rover_pkg.egg-info/dependency_links.txt
+[5.292s] writing entry points to ../../build/rover_pkg/rover_pkg.egg-info/entry_points.txt
+[5.293s] writing requirements to ../../build/rover_pkg/rover_pkg.egg-info/requires.txt
+[5.294s] writing top-level names to ../../build/rover_pkg/rover_pkg.egg-info/top_level.txt
+[5.451s] reading manifest file '../../build/rover_pkg/rover_pkg.egg-info/SOURCES.txt'
+[5.452s] adding license file 'LICENSE'
+[5.456s] writing manifest file '../../build/rover_pkg/rover_pkg.egg-info/SOURCES.txt'
+[5.456s] running build
+[5.457s] running build_py
+[5.459s] running install
+[5.509s] running install_lib
+[5.589s] running install_data
+[5.589s] copying package.xml -> /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/share/rover_pkg
+[5.590s] running install_egg_info
+[5.675s] removing '/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/python3.12/site-packages/rover_pkg-0.0.0-py3.12.egg-info' (and everything under it)
+[5.676s] Copying ../../build/rover_pkg/rover_pkg.egg-info to /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/python3.12/site-packages/rover_pkg-0.0.0-py3.12.egg-info
+[5.681s] running install_scripts
+[6.213s] Installing orangepi_node script to /home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/rover_pkg
+[6.215s] writing list of installed files to '/home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/install.log'
+[6.522s] Invoked command in '/home/rover3/TwoMonthRover_Team3/ros2_ws/src/rover_pkg' returned '0': AMENT_PREFIX_PATH=/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms:${AMENT_PREFIX_PATH} CMAKE_PREFIX_PATH=/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms LD_LIBRARY_PATH=/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib:${LD_LIBRARY_PATH} PYTHONPATH=/home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_pkg/lib/python3.12/site-packages:/home/rover3/TwoMonthRover_Team3/ros2_ws/install/rover_comms/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/rover_pkg build --build-base /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/build install --record /home/rover3/TwoMonthRover_Team3/ros2_ws/build/rover_pkg/install.log --install-scripts $base/lib/rover_pkg --single-version-externally-managed install_data
