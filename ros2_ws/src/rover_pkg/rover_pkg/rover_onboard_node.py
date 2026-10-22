@@ -39,7 +39,9 @@ class OrangePiRoverNode(Node):
         msg.altitude = 0.0
         msg.pressure = 0.5
         msg.temperature = -0.5
-        msg.acceleration = {1, 1, 1}
+        msg.acceleration.x = 1.0
+        msg.acceleration.y = 1.0
+        msg.acceleration.z = 1.0
         self.publisher_.publish(msg)
 
 def main(args=None):
