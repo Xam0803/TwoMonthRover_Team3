@@ -106,7 +106,7 @@ class GSNode(Node):
             self.update_angles(dt)
             msg = ArmControl()
             for joint, value in self.angles.items():
-                setattr(msg, joint, float(value))
+                setattr(msg, joint, int(round(value)))
             self.publisher_.publish(msg)
         self.draw()
 
