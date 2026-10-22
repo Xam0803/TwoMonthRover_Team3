@@ -22,9 +22,9 @@ from rover_comms.msg import ArmControl, Telemetry
 class GSNode(Node):
     def __init__(self):
         super().__init__('gs_node')
-        self.publisher_ = self.create_publisher(ArmControl, 'telem', 10)
+        self.publisher_ = self.create_publisher(ArmControl, 'rover/arm_command', 10)
         self.subscription = self.create_subscription(
-            ArmControl, 'arm_control', self.listener_callback, 10)
+            Telemetry, 'rover/telemetry', self.listener_callback, 10)
         self.timer = self.create_timer(0.1, self.tick)  # 10 Hz
 
     def listener_callback(self, msg):
