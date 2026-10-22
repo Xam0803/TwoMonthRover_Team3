@@ -19,7 +19,7 @@ from rover_comms.msg import ArmControl, Telemetry
 
 
 
-class ArmNode(Node):
+class OrangePiRoverNode(Node):
     def __init__(self):
         super().__init__('arm_node')
         self.publisher_ = self.create_publisher(Telemetry, 'telem', 10)
