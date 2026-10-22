@@ -12,6 +12,7 @@ import time
 import serial
 from datetime import datetime
 
+import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 from rover_comms.msg import ArmControl, Telemetry

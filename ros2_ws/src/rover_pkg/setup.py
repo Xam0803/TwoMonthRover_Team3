@@ -24,7 +24,8 @@ setup(
     },
     entry_points={
         'console_scripts': [
-            'orangepi_node = rover_pkg.rover_onboard_node:main'
+            'orangepi_node = rover_pkg.rover_onboard_node:main',
+            'ground_station_node = rover_pkg.ground_station_node:main'
         ],
     },
 )

@@ -12,6 +12,7 @@ import time
 import serial
 from datetime import datetime
 
+import rclpy
 from rclpy.node import Node
 from std_msgs.msg import String
 from rover_comms.msg import ArmControl, Telemetry
@@ -47,7 +48,7 @@ class GSNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = OrangePiRoverNode()
+    node = GSNode()
     try:
         rclpy.spin(node)
     except KeyboardInterrupt:
