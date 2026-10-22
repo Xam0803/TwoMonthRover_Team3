@@ -30,8 +30,8 @@ class OrangePiRoverNode(Node):
     def listener_callback(self, msg):
         self.get_logger().info(
             '\n'
-            f'Control: axes=({msg.axis0:.2f}, {msg.lower:.2f}, '
-            f'{msg.upper:.2f}, {msg.wrist:.2f}) claw={msg.claw:.2f}'
+            f'Control: axes=({msg.axis0}, {msg.lower}, '
+            f'{msg.upper}, {msg.wrist}) claw={msg.claw}'
         )
 
     def tick(self):
