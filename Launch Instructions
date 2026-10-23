@@ -1,0 +1,10 @@
+On Mac: 
+pixi shell
+source install/setup.zsh
+ros2 run rover_pkg ground_station_node
+
+On Orange Pi: 
+ssh rover3@192.168.2.10
+cd TwoMonthRover_Team3/ros2_ws/
+source install/setup.bash
+ros2 run rover_pkg orangepi_node 
