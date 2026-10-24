@@ -35,7 +35,7 @@ JOINTS = {
     'lower': (pygame.K_s,    pygame.K_w,     0.0, 180.0,  45.0),
     'upper': (pygame.K_DOWN, pygame.K_UP,    0.0, 180.0,  90.0),
     'wrist': (pygame.K_LEFT, pygame.K_RIGHT, 0.0, 180.0, 135.0),
-    'claw':  (pygame.K_q,    pygame.K_e,     0.0,  90.0,  45.0),
+    'claw':  (pygame.K_q,    pygame.K_e,     0.0,  135.0,  45.0),
 }
 
 LABELS = {
